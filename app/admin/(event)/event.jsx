@@ -1,32 +1,31 @@
 'use client'
-import React from 'react';
+import React, { useState } from 'react';
 import EventList from '../_components/eventList';
 
-const Event = ({ events = [] }) => { 
+
+
+const Event = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
     return (
-        <div className="p-5">
-          <h1 className="text-3xl font-bold mb-5">Event Page</h1>
-          <button 
-  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-5"
-  onClick={() => history.push('/create-event')}
->
-  Create Event
-</button>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-input leading-tight focus:outline-none focus:shadow-outline mb-5" type="text" placeholder="Search events..." />
-          {events.length > 0 ? (
-            events.map(event => (   
-              <div key={event.id} className="mb-4 p-4 border rounded shadow">
-                <h2 className="text-xl font-bold">{event.name}</h2>
-                <p className="text-gray-700">{event.description}</p>
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2 mr-2">Edit</button>
-                <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2">Delete</button>
-              </div>
-            ))
-          ) : (
-            <EventList />
-          )}
-        </div>
-      );
-    };
+      <div className="p-5">
+      <h2 className="text-3xl font-bold mb-5">Event Page</h2>
+      <button className="py-3 px-4 mb-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-2 mr-2">
+        Create Event
+      </button>
+      <input 
+        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-input leading-tight focus:outline-none focus:shadow-outline mb-5" 
+        type="text" 
+        placeholder="Search events..." 
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
+      <EventList />
+    </div>
+  );
+};
 
 export default Event;

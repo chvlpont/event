@@ -36,9 +36,9 @@ function EventList() {
   <span>{event.registrants}/{event.limit}</span>
   {event.registrants >= event.limit && <span className="ml-2 text-red-500">(Full)</span>}
 </div>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-opacity-50 transition duration-150 ease-in-out col-span-1">
-            Edit
-          </button>
+<button type="submit" className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out col-span-1">
+  Edit
+</button>
         </div>
       ))}
     </div>
