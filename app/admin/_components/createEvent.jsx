@@ -1,30 +1,59 @@
-import React from 'react';
+  import React from 'react';
 
-function CreateEvent() {
+  function CreateEvent() {
+    const handleSubmit = (event) => {
+      event.preventDefault();
+      // Handle form submission here
+    };
+
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h1 className="text-2xl font-bold mb-5">Create Event</h1>
-          <form className="w-full max-w-sm bg-white p-5 rounded shadow">
-            <label className="block mb-2">
-              <span className="text-gray-700">Title:</span>
-              <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-            </label>
-            <label className="block mb-2">
-              <span className="text-gray-700">Location:</span>
-              <input type="text" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-            </label>
-            <label className="block mb-2">
-              <span className="text-gray-700">Date & Time:</span>
-              <input type="datetime-local" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-            </label>
-            <label className="block mb-2">
-              <span className="text-gray-700">Number of Seats:</span>
-              <input type="number" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-            </label>
-            <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700">Create Event</button>
-          </form>
-        </div>
-      );
-    }
+      
+      
+        <form onSubmit={handleSubmit} className="w-full max-w-lg bg-blue-700 dark:bg-gray-200 p-8 rounded-lg shadow-lg">
+          <label className="block mb-4">
+            <span className="text-blue-400 dark:text-blue-800">Title:</span>
+            <input type="text" className="form-input mt-1 block w-full rounded-md bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50" />
+          </label>
+          <label className="block mb-4">
+            <span className="text-blue-400 dark:text-blue-800">Location:</span>
+            <input type="text" className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50" />
+          </label>
+          <label className="block mb-4">
+            <span className="text-blue-400 dark:text-blue-800">Category:</span>
+            <select className="form-select mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50">
+              <option value="">Select a category</option>
+              <option>Conference</option>
+              <option>Meetup</option>
+              <option>Workshop</option>
+              <option>Seminar</option>
+              <option>Party</option>
+            </select>
+          </label>
+          <label className="block mb-4">
+            <span className="text-blue-400 dark:text-blue-800">Date & Time:</span>
+            <input type="datetime-local" className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50" />
+          </label>
+          <label className="block mb-4">
+            <span className="text-blue-400 dark:text-blue-800">Description:</span>
+            <textarea className="form-textarea mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50" rows="3"></textarea>
+          </label>
+          <label className="block mb-4">
+            <span className="text-blue-400 dark:text-blue-800">Number of Seats:</span>
+            <input type="number" min="1" className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50" />
+          </label>
+          <label className="block mb-4">
+  <span className="text-blue-400 dark:text-blue-800">Upload Images:</span>
+  <input type="file" className="form-input mt-1 block w-full bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50 p-2 rounded" multiple />
+</label>
+          <button type="submit" className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out">
+  Create Event
+</button>
+        </form>
+     
+    );
+  }
 
-export default CreateEvent;
+
+
+  export default CreateEvent;

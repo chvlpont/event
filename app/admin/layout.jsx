@@ -4,16 +4,16 @@ import Sidebar from './_components/sidebar'
 import MainContent from './_components/mainContent'
 
 function Layout() {
-    const [selectedPage, setSelectedPage] = useState('Dashboard'); // Initialize selectedPage state
+    const [selectedPage, setSelectedPage] = useState('Dashboard'); 
   
     return (
-      <div style={{ display: 'flex' }}>
-        <Sidebar setSelectedPage={setSelectedPage} /> {/* Pass setSelectedPage to Sidebar */}
-        <main style={{ flex: 1, padding: '10px' }}>
-          <MainContent selectedPage={selectedPage} /> {/* Replace children with MainContent */}
-        </main>
+      <div className="flex h-screen overflow-hidden">
+          <Sidebar setSelectedPage={setSelectedPage} />
+          <main className="flex-1 overflow-y-auto p-2.5 bg-gray-400"> {/* Added bg-color for contrast */}
+              <MainContent selectedPage={selectedPage} />
+          </main>
       </div>
-    );
-  }
+  );
+}
 
 export default Layout

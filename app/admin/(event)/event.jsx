@@ -1,5 +1,6 @@
 'use client'
 import React from 'react';
+import EventList from '../_components/eventList';
 
 const Event = ({ events = [] }) => { 
     return (
@@ -11,7 +12,7 @@ const Event = ({ events = [] }) => {
 >
   Create Event
 </button>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-5" type="text" placeholder="Search events..." />
+          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-input leading-tight focus:outline-none focus:shadow-outline mb-5" type="text" placeholder="Search events..." />
           {events.length > 0 ? (
             events.map(event => (   
               <div key={event.id} className="mb-4 p-4 border rounded shadow">
@@ -22,7 +23,7 @@ const Event = ({ events = [] }) => {
               </div>
             ))
           ) : (
-            <p className="text-gray-500">No events to display</p>
+            <EventList />
           )}
         </div>
       );

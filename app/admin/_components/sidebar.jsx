@@ -15,16 +15,33 @@ function Sidebar({ setSelectedPage }) {
     setIsCollapsed(window.innerWidth <= 640);
   }, []);
 
+  useEffect(() => {
+    console.log('activePage', activePage);
+    console.log('activeSubPage', activeSubPage);
+  }, [activePage, activeSubPage]);
+
   // handlePageSelect function
   const handlePageSelect = (page, subPage) => {
+    console.log('handlePageSelect', page, subPage);
+    setSelectedPage(page);
+    setActivePage(page);
+    
+    let newSubPage = activeSubPage;
+    
     if (subPage) {
       setSelectedPage(subPage);
-      setActiveSubPage(subPage);
+      if (subPage !== activeSubPage) {
+        newSubPage = subPage;
+        setActiveSubPage(newSubPage);
+      }
     } else {
-      setSelectedPage(page);
-      setActiveSubPage('');
+      newSubPage = '';
+      setActiveSubPage(newSubPage);
     }
-    setActivePage(page); 
+    
+    console.log('activePage', activePage);
+    console.log('activeSubPage', newSubPage);
+    
     if (page === 'Event' && !subPage) {
       setShowEventOptions(!showEventOptions);
     } else if (page !== 'Event') {
@@ -76,15 +93,19 @@ function Sidebar({ setSelectedPage }) {
       {showEventOptions && (
         <>
 <div className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('Event', 'CreateEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('Event', 'CreateEvent'))} tabIndex="0" role="button" aria-label="Create Event">
-  <FaCalendarCheck className={`text-white mr-2 ${activeSubPage === 'CreateEvent' ? 'text-blue-500' : ''}`} />
-  {!isCollapsed && <p className={`text-white ${activeSubPage === 'CreateEvent' ? 'text-blue-500' : ''}`}>Create Event</p>}
+  <FaCalendarCheck className={`text-white mr-2 ${activePage === 'Event' && activeSubPage === 'CreateEvent' ? '!text-blue-500' : ''}`} />
+  {!isCollapsed && <p className={`text-white ${activePage === 'Event' && activeSubPage === 'CreateEvent' ? '!text-blue-500' : ''}`}>Create Event</p>}
 </div>
-
 
 <div className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('Event', 'EditEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('Event', 'EditEvent'))} tabIndex="0" role="button" aria-label="Edit Event">
   <FaEdit className={`text-white mr-2 ${activeSubPage === 'EditEvent' ? 'text-yellow-500' : ''}`} />
   {!isCollapsed && <p className={`text-white ${activeSubPage === 'EditEvent' ? 'text-yellow-500' : ''}`}>Edit Event</p>}
 </div>
+{/* <div className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('Event', 'CreateEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('Event', 'CreateEvent'))} tabIndex="0" role="button" aria-label="Create Event">
+  <FaEdit className={`text-white mr-2 ${activeSubPage === 'CreateEvent' ? 'text-green-500' : ''}`} />
+  {!isCollapsed && <p className={`text-white ${activeSubPage === 'CreateEvent' ? 'text-green-500' : ''}`}>Create Event</p>}
+</div> */}
+
 
 
 

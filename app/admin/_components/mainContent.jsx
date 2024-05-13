@@ -1,31 +1,25 @@
 import React from 'react';
-import Dashboard from './Dashboard';
-import User from './User';
-import Event from './Event'; 
-import CreateEvent from './CreateEvent';
-import EditEvent from './EditEvent';
-import CMSDashboard from './CMSDashboard';
-import Settings from './Settings';
+import Dashboard from '../(dashboard)/dashboard';
+import User from '../(user)/user';
+import Event from '../(event)/event';
+import CreateEvent from '../(createEvent)/createEvent';
+import EditEvent from '../(editEvent)/editEvent';
+import CMSDashboard from '../(CMSDashboard)/CMSDashboard';
+import Settings from '../(settings)/settings';
 
 function MainContent({ selectedPage }) {
-  switch (selectedPage) {
-    case 'Dashboard':
-      return <Dashboard />;
-    case 'User':
-      return <User />;
-      case 'Event': 
-      return <Event />;
-    case 'CreateEvent':
-      return <CreateEvent />;
-    case 'EditEvent':
-      return <EditEvent />;
-    case 'CMSDashboard':
-      return <CMSDashboard />;
-    case 'Settings':
-      return <Settings />;
-    default:
-      return <Dashboard />;
-  }
+  return (
+    <div key={selectedPage}>
+      {selectedPage === 'Dashboard' && <Dashboard />}
+      {selectedPage === 'User' && <User />}
+      {selectedPage === 'Event' && <Event />}
+      {selectedPage === 'CreateEvent' && <CreateEvent />}
+      {selectedPage === 'EditEvent' && <EditEvent />}
+      {selectedPage === 'CMSDashboard' && <CMSDashboard />}
+      {selectedPage === 'Settings' && <Settings />}
+      {selectedPage === 'default' && <Dashboard />}
+    </div>
+  );
 }
 
 export default MainContent;
