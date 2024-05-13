@@ -1,6 +1,6 @@
 import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
-import { SignInButton, SignOutButton, SignedIn, SignedOut } from "@clerk/nextjs"
+import { SignInButton, SignUpButton, SignOutButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import Link from "next/link"
 
 function LandingPage() {
@@ -15,6 +15,11 @@ function LandingPage() {
               Sign in
             </Button>
           </SignInButton>
+          <SignUpButton mode="modal">
+            <Button variant="secondary">
+              Sign up
+            </Button>
+          </SignUpButton>
         </SignedOut>
         <SignedIn>
           <SignOutButton>
