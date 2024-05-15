@@ -2,6 +2,7 @@ import { ModeToggle } from "@/components/mode-toggle"
 import { Button } from "@/components/ui/button"
 import { SignInButton, SignUpButton, SignOutButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import Link from "next/link"
+import { FaArrowCircleRight } from "react-icons/fa";
 
 function LandingPage() {
   return (
@@ -13,19 +14,19 @@ function LandingPage() {
           <SignedOut>
             <SignInButton mode="modal">
               <Button>
-                Sign in
+                <p>Sign in</p>
               </Button>
             </SignInButton>
             <SignUpButton mode="modal">
               <Button variant="secondary">
-                Sign up
+                <p>Sign up</p>
               </Button>
             </SignUpButton>
           </SignedOut>
           <SignedIn>
             <SignOutButton>
               <Button>
-                Sign out
+                <p>Sign out</p>
               </Button>
             </SignOutButton>
           </SignedIn>
@@ -34,8 +35,11 @@ function LandingPage() {
       
       <div className="flex flex-col items-center gap-4">
         <SignedIn>
-          <Button asChild className="mt-4">
-            <Link href="/admin">Enter dashboard</Link>
+          <Button asChild className="flex mt-10 absolute h-12 gap-2">
+            <Link href="/admin">
+              <p className="text-lg">Enter dashboard</p>
+              <FaArrowCircleRight className=""/>
+            </Link>
           </Button>
         </SignedIn>
         <h1 className="text-6xl font-bold mt-32">En jättebra rubrik</h1>
