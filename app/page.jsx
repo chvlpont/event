@@ -1,10 +1,9 @@
 "use client";
 
-import { useUser } from "@clerk/clerk-react";
 import { saveUserToFirestore } from "../saveUser";
 import React, { useEffect } from "react";
 import { auth } from "@/firebase.config";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { signInWithCustomToken } from "firebase/auth";
 
 function HomePage() {
