@@ -6,7 +6,7 @@ const MainContent = React.lazy(() => import('./_components/mainContent'));
 const AdminNavbar = React.lazy(() => import('./_components/adminNavbar'));
 
 
-function Layout() {
+function AdminLayout() {
   const [selectedPage, setSelectedPage] = useState('Dashboard'); 
 
   const loader = (
@@ -28,4 +28,4 @@ function Layout() {
   );
 }
 
-export default Layout
+export default AdminLayout
