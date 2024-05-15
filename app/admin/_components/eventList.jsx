@@ -15,18 +15,18 @@ function EventList() {
   };
   
     return (
-<div className="p-4 grid gap-4">
-<div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg  grid grid-cols-7 gap-4 items-center font-bold">
-    <p className="col-span-1"></p>
-    <p className="col-span-1">Title</p>
-    <p className="col-span-1">Date</p>
-    <p className="col-span-1">Location</p>
-    <p className="col-span-1">Description</p>
-    <p className=" text-center col-span-1">Registrants</p>
-    <p className="text-center col-span-1">Actions</p>
-  </div>
-  {events.map((event) => (
-        <div key={event.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-4 grid grid-cols-7 gap-4 items-center">
+      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-t-lg shadow-lg grid grid-cols-7 items-center font-bold">
+        <p className="col-span-1"></p>
+        <p className="text-blue-500 font-semibold">Title</p>
+                <p className="text-blue-500 font-semibold">Date</p>
+                <p className="text-blue-500 font-semibold">Location</p>
+                <p className="text-blue-500 font-semibold ">Description</p>
+                <p className="text-blue-500 font-semibold text-center">Registrants</p>
+                <p className="text-blue-500 font-semibold text-center">Actions</p>
+      </div>
+      {events.map((event, index) => (
+        <div key={event.id} className={`bg-white dark:bg-gray-800 p-4 shadow-lg grid grid-cols-7 items-center ${index === events.length - 1 ? 'rounded-b-lg' : ''}`}>
           <img src={event.image} alt="Event" className="w-16 h-16 rounded-full shadow col-span-1"/>
           <h2 className="text-lg font-semibold col-span-1">{event.title}</h2>
           <p className="col-span-1">{event.date}</p>

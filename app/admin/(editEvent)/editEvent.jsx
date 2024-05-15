@@ -4,9 +4,13 @@ import EventList from '../_components/eventList';
 function EditEvent() {
   return (
     <div>
-      <h1>Edit Event</h1>
+      <div className='p-4 text-center'>
+      <h1 className='text-4xl'>Edit Event</h1>
       <p>Welcome to the edit event page!</p>
-      <EventList />
+      </div>
+      <div className="p-4">
+  <EventList />
+</div>
     </div>
   );
 }

@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react'
 import { FaUser, FaCog, FaCalendarCheck, FaCalendarPlus, FaEdit, FaPaintBrush, FaAngleDoubleRight, FaAngleDoubleLeft, FaChevronDown, FaChevronRight, FaSignOutAlt  } from 'react-icons/fa'
 import { MdDashboard } from "react-icons/md";
 
+import dynamic from 'next/dynamic';
+
+const SignOutButton = dynamic(() => import('@clerk/nextjs').then(mod => mod.SignOutButton), { ssr: false });
+
 function Sidebar({ setSelectedPage }) {
   const [showEventOptions, setShowEventOptions] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false); // default to false
@@ -71,14 +75,14 @@ function Sidebar({ setSelectedPage }) {
 
 
   return (
-    <div className={`h-screen bg-gray-800 text-white flex flex-col items-start justify-start pt-5 transition-all duration-500 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
-      <div className="flex items-center w-full mb-2 p-4 justify-between">
-        {!isCollapsed && <h1 className="h-8 w-auto text-white text-center text-2xl font-bold tracking-wide ">AdminPanel</h1>} 
+    <div className={`h-screen bg-gray-800 text-white flex flex-col items-start justify-start pt-2 transition-all duration-500 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'}`}>
+      <div className="flex items-center w-full mb-2 p-4 justify-between h-[60px]">
+        {!isCollapsed && <h1 className="h-7 w-auto text-white text-center text-2xl font-bold tracking-wide ">AdminPanel</h1>} 
         {isCollapsed 
-          ? <FaAngleDoubleRight className="text-white mr-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)} onKeyDown={(event) => handleKeyDown(event, () => setIsCollapsed(!isCollapsed))} tabIndex="0" role="button" aria-label="Expand Sidebar" /> 
+          ? <FaAngleDoubleRight className="text-white ml-auto mr-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)} onKeyDown={(event) => handleKeyDown(event, () => setIsCollapsed(!isCollapsed))} tabIndex="0" role="button" aria-label="Expand Sidebar" /> 
           : <FaAngleDoubleLeft className="text-white mr-2 cursor-pointer" onClick={() => setIsCollapsed(!isCollapsed)} onKeyDown={(event) => handleKeyDown(event, () => setIsCollapsed(!isCollapsed))} tabIndex="0" role="button" aria-label="Collapse Sidebar" />}
       </div>
-      <hr className="border-t border-gray-700 w-full"/>
+      <hr className="border-t border-gray-700 w-full mb-5"/>
       
       <div className={`cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 ${activePage === 'Dashboard' ? 'bg-gray-700 text-white border-l-4 border-blue-500' : ''}`} onClick={() => handlePageSelect('Dashboard')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('Dashboard'))} tabIndex="0" role="button" aria-label="Dashboard">
   <MdDashboard  className="text-white mr-2" />
@@ -101,10 +105,6 @@ function Sidebar({ setSelectedPage }) {
   <FaEdit className={`text-white mr-2 ${activeSubPage === 'EditEvent' ? 'text-yellow-500' : ''}`} />
   {!isCollapsed && <p className={`text-white ${activeSubPage === 'EditEvent' ? 'text-yellow-500' : ''}`}>Edit Event</p>}
 </div>
-{/* <div className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('Event', 'CreateEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('Event', 'CreateEvent'))} tabIndex="0" role="button" aria-label="Create Event">
-  <FaEdit className={`text-white mr-2 ${activeSubPage === 'CreateEvent' ? 'text-green-500' : ''}`} />
-  {!isCollapsed && <p className={`text-white ${activeSubPage === 'CreateEvent' ? 'text-green-500' : ''}`}>Create Event</p>}
-</div> */}
 
 
 
@@ -125,10 +125,12 @@ function Sidebar({ setSelectedPage }) {
   {!isCollapsed && <p className={`text-white transition-opacity duration-500 ease-in-out ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>Settings</p>}
 </div>
 
-      <div className="mt-auto cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4" onClick={() => {/* Add your logout function here */}} onKeyDown={(event) => handleKeyDown(event, () => {/* Add your logout function here */})} tabIndex="0" role="button" aria-label="Log out">
-        <FaSignOutAlt className="text-white mr-2" />
-        {!isCollapsed && <p className={`text-white transition-opacity duration-500 ease-in-out ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>Log out</p>}
-      </div>
+<SignOutButton className="mt-auto cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4">
+  <div className="flex items-center">
+    <FaSignOutAlt className="text-white mr-2" />
+    {!isCollapsed && <p className={`text-white transition-opacity duration-500 ease-in-out ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>Log out</p>}
+  </div>
+</SignOutButton>
 
     </div>
   )
