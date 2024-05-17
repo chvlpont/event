@@ -20,16 +20,15 @@ const Event = () => {
         </button>
         <div className="relative w-full lg:w-10/12 xl:w-8/12">
         <input 
-  className="shadow appearance-none border rounded w-full py-2 px-3 text-foreground bg-input leading-tight focus:outline-none focus:shadow-outline" 
+   className="shadow appearance-none border border-gray-400 rounded w-full py-2 px-3 text-gray-700 bg-gray-800 leading-tight focus:outline-none focus:shadow-outline"  
   type="text" 
   placeholder="Search events..." 
   value={searchTerm}
   onChange={handleSearchChange}
 />
-          <FaSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 cursor-pointer" />
         </div>
       </div>
-      <EventList />
+      <EventList searchTerm={searchTerm} />
     </div>
   );
 };

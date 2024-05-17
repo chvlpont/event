@@ -1,12 +1,13 @@
 import React from 'react';
+import Profile from '../_components/profile';
 
 function Settings() {
   return (
-    <div>
+    <div className="settings-page">
       <h1>Settings</h1>
-      <p>Welcome to the settings page!</p>
+      {/* <Profile /> */}
     </div>
   );
-}
+};
 
 export default Settings;

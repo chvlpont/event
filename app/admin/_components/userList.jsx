@@ -49,35 +49,34 @@ function UserList() {
 <p className='text-blue-500 font-semibold'>Actions</p>
       </div>
       {filteredUsers.map((user, index) => (
-        <div key={user.id} className={`grid p-2 items-center ${index < filteredUsers.length - 1 ? 'border-b border-gray-700' : ''}`} style={{gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gridGap: '1rem'}}>
-          <div className="flex items-center space-x-4">
-            <img src={user.profilePic} alt={user.name} className="w-10 h-10 rounded-full" />
-            <div>
-            <p className="font-bold text-lg pl-4">{user.name}</p>
+  <div key={user.id} className={`grid p-2 items-center text-white ${index < filteredUsers.length - 1 ? 'border-b border-gray-700' : ''}`} style={{gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gridGap: '1rem'}}>
+    <div className="flex items-center space-x-4">
+      <img src={user.profilePic} alt={user.name} className="w-10 h-10 rounded-full" />
+      <div>
+        <p className="font-bold text-lg pl-4">{user.name}</p>
         <p className="pl-4">{user.email}</p>
-            </div>
-          </div>
-          <p>{user.role}</p>
-          <p>{new Date(user.created_at).toLocaleDateString()}</p> {/* Display account creation date */}
-          <p >{new Date(user.last_login).toLocaleDateString()}</p> {/* Display last login date */}
-          <div>
-            <DropdownMenu>
-            <DropdownMenuTrigger>
-  <IoEllipsisVerticalOutline />
-</DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-gray-900 rounded p-2 shadow-2xl">
-              {user.isAdmin ? (
-  <DropdownMenuItem className="cursor-pointer" onSelect={() => handleDemote(user.id)}>Demote</DropdownMenuItem>
-) : (
-  <DropdownMenuItem className="cursor-pointer" onSelect={() => handlePromote(user.id)}>Promote</DropdownMenuItem>
-)}
-                <DropdownMenuItem className="cursor-pointer" onSelect={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
-                {/* Add more options as needed */}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      ))}
+      </div>
+    </div>
+    <p>{user.role}</p>
+    <p>{new Date(user.created_at).toLocaleDateString()}</p> 
+    <p>{new Date(user.last_login).toLocaleDateString()}</p> 
+    <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <IoEllipsisVerticalOutline />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="bg-gray-800 rounded p-2 shadow-2xl mr-4 border border-gray-300">
+  {user.isAdmin ? (
+    <DropdownMenuItem className="cursor-pointer focus:bg-gray-700 focus:text-white text-white" onSelect={() => handleDemote(user.id)}>Demote</DropdownMenuItem>
+  ) : (
+    <DropdownMenuItem className="cursor-pointer focus:bg-gray-700 focus:text-white text-white" onSelect={() => handlePromote(user.id)}>Promote</DropdownMenuItem>
+  )}
+  <DropdownMenuItem className="cursor-pointer focus:bg-gray-700 focus:text-white text-white" onSelect={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
+</DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  </div>
+))}
     </div>
   </div>
 );

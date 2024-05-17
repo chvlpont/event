@@ -11,7 +11,7 @@ const Event = ({ events = [] }) => {
 >
   Create Event
 </button>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-5" type="text" placeholder="Search events..." />
+<input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-200 leading-tight focus:outline-none focus:shadow-outline mb-5" type="text" placeholder="Search events..." />
           {events.length > 0 ? (
             events.map(event => (   
               <div key={event.id} className="mb-4 p-4 border rounded shadow">

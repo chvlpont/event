@@ -97,7 +97,7 @@ function Sidebar({ setSelectedPage }) {
       {showEventOptions && (
         <>
 <div className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('Event', 'CreateEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('Event', 'CreateEvent'))} tabIndex="0" role="button" aria-label="Create Event">
-  <FaCalendarCheck className={`text-white mr-2 ${activePage === 'Event' && activeSubPage === 'CreateEvent' ? '!text-blue-500' : ''}`} />
+  <FaCalendarPlus className={`text-white mr-2 ${activePage === 'Event' && activeSubPage === 'CreateEvent' ? '!text-blue-500' : ''}`} />
   {!isCollapsed && <p className={`text-white ${activePage === 'Event' && activeSubPage === 'CreateEvent' ? '!text-blue-500' : ''}`}>Create Event</p>}
 </div>
 
