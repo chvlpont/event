@@ -1,20 +1,21 @@
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
-import { ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db, storage } from "../../firebase.config"; // Import Firestore database and Storage references
 import { useClerk } from '@clerk/nextjs'; // Import Clerk hook for authentication
 
 
-// Function to create a new event
 export async function createEvent(title, date, description, imageFile, category, location, numberOfSeats) {
   try {
-    // Upload image to Firebase Storage
+    if (!imageFile) {
+      throw new Error('Image file is required.');
+    }
+
     const imageRef = ref(storage, `images/${imageFile.name}`);
     await uploadBytes(imageRef, imageFile);
 
     // Get download URL of the uploaded image
-    const imageUrl = await imageRef.getDownloadURL();
+    const imageUrl = await getDownloadURL(imageRef);
 
-    // Add event data to Firestore
     const eventsCollection = collection(db, "events");
     const newEvent = {
       title,
@@ -23,16 +24,18 @@ export async function createEvent(title, date, description, imageFile, category,
       imageUrl,
       category,
       location,
-      numberOfSeats, // Include numberOfSeats in event data
+      numberOfSeats,
     };
+
     const eventRef = await addDoc(eventsCollection, newEvent);
     console.log("Event created successfully! Event ID:", eventRef.id);
     return eventRef.id;
   } catch (error) {
-    console.error("Error creating event:", error);
+    console.error("Error creating event:", error.message);
     throw error;
   }
 }
+
 
 
 
