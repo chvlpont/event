@@ -1,5 +1,5 @@
 import { collection, addDoc, deleteDoc, getDocs } from "firebase/firestore";
-import { db } from "./firebase.config"; // Import Firestore database reference from firebaseConfig.js
+import { db } from "../firebase.config"; // Import Firestore database reference from firebaseConfig.js
 
 // Function to save user ID as admin in Firestore
 // Function to save user ID as admin in Firestore

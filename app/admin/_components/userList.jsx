@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import {
   saveAdminToFirestore,
   removeAdminFromFirestore,
-} from "../../../adminUtils";
+} from "../../../utils/adminUtils";
 
 import {
   DropdownMenu,

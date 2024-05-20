@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createEvent } from '../../api/eventservices'; // Import createEvent function
+import { createEvent } from '../../../utils/eventservices'; // Import createEvent function
 
 function CreateEvent() {
   const [formData, setFormData] = useState({

@@ -1,6 +1,6 @@
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../../firebase.config"; // Import Firestore database and Storage references
+import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
 import { useClerk } from '@clerk/nextjs'; // Import Clerk hook for authentication
 
 
