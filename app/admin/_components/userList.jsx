@@ -1,87 +1,165 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import { IoEllipsisVerticalOutline } from "react-icons/io5";
-
+import { useAuth } from "@clerk/nextjs";
+import {
+  saveAdminToFirestore,
+  removeAdminFromFirestore,
+} from "../../../utils/adminUtils";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 function UserList() {
-  const [users, setUsers] = useState([
-    { id: 1, name: 'Albert Einstein', email: 'einstein@example.com', role: 'User', isAdmin: false, profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0khaUcbpblqXKUuxIpxyGB9VqRKmENQZWjbk8uXGEIg&s', created_at: new Date(), last_login: new Date() },
-  { id: 2, name: 'Marie Curie', email: 'curie@example.com', role: 'Admin', isAdmin: true, profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0khaUcbpblqXKUuxIpxyGB9VqRKmENQZWjbk8uXGEIg&s', created_at: new Date(), last_login: new Date() },
-  { id: 3, name: 'Isaac Newton', email: 'newton@example.com', role: 'User', isAdmin: false, profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0khaUcbpblqXKUuxIpxyGB9VqRKmENQZWjbk8uXGEIg&s', created_at: new Date(), last_login: new Date() },
-  { id: 4, name: 'Rosalind Franklin', email: 'franklin@example.com', role: 'Admin', isAdmin: true, profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0khaUcbpblqXKUuxIpxyGB9VqRKmENQZWjbk8uXGEIg&s', created_at: new Date(), last_login: new Date() },
-  { id: 5, name: 'Nikola Tesla', email: 'tesla@example.com', role: 'User', isAdmin: false, profilePic: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0khaUcbpblqXKUuxIpxyGB9VqRKmENQZWjbk8uXGEIg&s', created_at: new Date(), last_login: new Date() },
-    // Add more users as needed
-  ]);
-
+  const [adminUsernames, setAdminUsernames] = useState([]);
+  const [nonAdminUsernames, setNonAdminUsernames] = useState([]);
   const [showAdmins, setShowAdmins] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const currentUser = useAuth();
 
-  const filteredUsers = showAdmins ? users.filter(user => user.isAdmin) : users.filter(user => !user.isAdmin);
+  useEffect(() => {
+    fetchData();
+  }, [showAdmins]);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch("/api/userData");
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setAdminUsernames(data.adminUsernames);
+      setNonAdminUsernames(data.nonAdminUsernames);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handlePromote = async (userId) => {
+    try {
+      console.log("Promoting user with userId:", userId);
+      await saveAdminToFirestore(userId);
+
+      // Update the state after successful promotion
+      const promotedUser = nonAdminUsernames.find(
+        (user) => user.userId === userId
+      );
+      setAdminUsernames([...adminUsernames, promotedUser]);
+      setNonAdminUsernames(
+        nonAdminUsernames.filter((user) => user.userId !== userId)
+      );
+    } catch (error) {
+      console.error("Error promoting user to admin:", error);
+    }
+  };
+
+  const handleDemote = async (userId) => {
+    try {
+      if (userId === currentUser.userId) {
+        console.error("You cannot demote yourself.");
+        return;
+      }
+      console.log("Demoting user with userId:", userId);
+      await removeAdminFromFirestore(userId);
+
+      // Update the state after successful demotion
+      const demotedUser = adminUsernames.find((user) => user.userId === userId);
+      setNonAdminUsernames([...nonAdminUsernames, demotedUser]);
+      setAdminUsernames(
+        adminUsernames.filter((user) => user.userId !== userId)
+      );
+    } catch (error) {
+      console.error("Error demoting user:", error);
+    }
+  };
 
   return (
-<div className="p-4">
-    <div className="mb-4">
-      <button 
-        onClick={() => setShowAdmins(false)}
-        className={`px-4 py-2 rounded-l ${!showAdmins ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
-      >
-        Regular
-      </button>
-      <button 
-        onClick={() => setShowAdmins(true)}
-        className={`px-4 py-2 rounded-r ${showAdmins ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
-      >
-        Admins
-      </button>
-    </div>
-       <div className="bg-gray-800 rounded-md">
-      <div className="grid p-2 text-white border-b border-gray-700" style={{gridTemplateColumns: '1fr 1fr 1fr 1fr auto'}}>
-      <p className='pl-24 text-blue-500 font-semibold'>User</p>
-<p className='text-blue-500 font-semibold pl-2'>Role</p>
-<p className="text-left pl-5 text-blue-500 font-semibold">Created At</p>
-<p className="text-left pl-7 text-blue-500 font-semibold">Last Login</p>
-<p className='text-blue-500 font-semibold'>Actions</p>
+    <div className="p-4">
+      <div className="mb-4">
+        <button
+          onClick={() => setShowAdmins(false)}
+          className={`px-4 py-2 rounded-l ${
+            !showAdmins ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"
+          }`}
+        >
+          Regular
+        </button>
+        <button
+          onClick={() => setShowAdmins(true)}
+          className={`px-4 py-2 rounded-r ${
+            showAdmins ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-500"
+          }`}
+        >
+          Admins
+        </button>
       </div>
-      {filteredUsers.map((user, index) => (
-        <div key={user.id} className={`grid p-2 items-center ${index < filteredUsers.length - 1 ? 'border-b border-gray-700' : ''}`} style={{gridTemplateColumns: '1fr 1fr 1fr 1fr auto', gridGap: '1rem'}}>
-          <div className="flex items-center space-x-4">
-            <img src={user.profilePic} alt={user.name} className="w-10 h-10 rounded-full" />
-            <div>
-            <p className="font-bold text-lg pl-4">{user.name}</p>
-        <p className="pl-4">{user.email}</p>
-            </div>
-          </div>
-          <p>{user.role}</p>
-          <p>{new Date(user.created_at).toLocaleDateString()}</p> {/* Display account creation date */}
-          <p >{new Date(user.last_login).toLocaleDateString()}</p> {/* Display last login date */}
-          <div>
-            <DropdownMenu>
-            <DropdownMenuTrigger>
-  <IoEllipsisVerticalOutline />
-</DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-gray-900 rounded p-2 shadow-2xl">
-              {user.isAdmin ? (
-  <DropdownMenuItem className="cursor-pointer" onSelect={() => handleDemote(user.id)}>Demote</DropdownMenuItem>
-) : (
-  <DropdownMenuItem className="cursor-pointer" onSelect={() => handlePromote(user.id)}>Promote</DropdownMenuItem>
-)}
-                <DropdownMenuItem className="cursor-pointer" onSelect={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
-                {/* Add more options as needed */}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <div className="bg-gray-800 rounded-md">
+        <div
+          className="grid p-2 text-white border-b border-gray-700"
+          style={{ gridTemplateColumns: "1fr 1fr 1fr 1fr auto" }}
+        >
+          <p className="pl-4 text-blue-500 font-semibold">User</p>
+          <p className="text-blue-500 font-semibold pl-2">Role</p>
+          <p className="text-left pl-5 text-blue-500 font-semibold">
+            Created At
+          </p>
+          <p className="text-left pl-7 text-blue-500 font-semibold">
+            Last Login
+          </p>
+          <p className="text-blue-500 font-semibold">Actions</p>
         </div>
-      ))}
+        {(showAdmins ? adminUsernames : nonAdminUsernames).map(
+          (user, index) => (
+            <div
+              key={index}
+              className={`grid p-2 items-center ${
+                index <
+                (showAdmins ? adminUsernames : nonAdminUsernames).length - 1
+                  ? "border-b border-gray-700"
+                  : ""
+              }`}
+              style={{
+                gridTemplateColumns: "1fr 1fr 1fr 1fr auto",
+                gridGap: "1rem",
+              }}
+            >
+              <p className="font-bold text-lg pl-4">{user.username}</p>
+              <p>{showAdmins ? "Admin" : "Regular"}</p>
+              <p>{user.createdAt}</p>
+              <p>{user.lastSignInAt}</p>
+              <div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <IoEllipsisVerticalOutline />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="bg-gray-900 rounded p-2 shadow-2xl">
+                    {showAdmins && (
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => handleDemote(user.userId)}
+                      >
+                        Demote
+                      </DropdownMenuItem>
+                    )}
+                    {!showAdmins && (
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => handlePromote(user.userId)}
+                      >
+                        Promote
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+          )
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
 }
-
 
 export default UserList;
