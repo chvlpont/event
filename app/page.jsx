@@ -1,49 +1,31 @@
 "use client";
-
-import { saveUserToFirestore } from "../saveUser";
-import React, { useEffect } from "react";
-import { auth } from "@/firebase.config";
-import { useAuth, useUser } from "@clerk/nextjs";
-import { signInWithCustomToken } from "firebase/auth";
+import React from "react";
 import LandingPage from "./_components/landing-page";
+import { auth } from "@/firebase.config";
+import { useAuth } from "@clerk/nextjs";
+import { signInWithCustomToken } from "firebase/auth";
+import { useEffect } from "react";
 
-function HomePage() {
-  const { user } = useUser();
+const HomePage = () => {
   const { userId, isLoaded, getToken } = useAuth();
 
-  // Function to log user information and sign in via Firebase Authentication
   useEffect(() => {
-    const logUserInformation = async () => {
-      // Check if user is loaded and authenticated
-      if (user && userId && isLoaded) {
-        // Log user information to console
-        console.log("User information:", user);
+    if (!isLoaded || !userId) return; // Check if the user is loaded and exists
 
-        // Check if user data has been saved to database
-        const isUserSaved = sessionStorage.getItem("isUserSaved");
-
-        if (!isUserSaved) {
-          // Save user data to database
-          await saveUserToFirestore(user);
-          sessionStorage.setItem("isUserSaved", "true");
-        }
-
-        // Sign in the user via Firebase Authentication
-        const token = await getToken({ template: "integration_firebase" });
-        const userCredentials = await signInWithCustomToken(auth, token || "");
-        console.log("User:", userCredentials.user);
-        console.log(
-          userCredentials.user.uid,
-          "has been stored in authentication!"
-        );
-      }
+    const signInWithClerk = async () => {
+      const token = await getToken({ template: "integration_firebase" });
+      const userCredentials = await signInWithCustomToken(auth, token || "");
+      console.log("User:", userCredentials.user);
     };
 
-    // Call function to log user information
-    logUserInformation();
-  }, [user, userId, isLoaded, getToken]);
+    signInWithClerk();
+  }, [isLoaded, userId, getToken]);
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
 
   return <LandingPage />;
-}
+};
 
 export default HomePage;
