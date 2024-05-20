@@ -52,7 +52,7 @@ function EventList() {
     </div>
     {eventList.map((event, index) => (
       <div key={event.id} className={`bg-white dark:bg-gray-800 p-4 shadow-lg grid grid-cols-7 items-center ${index === eventList.length - 1 ? 'rounded-b-lg' : ''}`}>
-        <img src={event.image} alt="Event" className="w-16 h-16 rounded-full shadow col-span-1"/>
+        <img src={event.imageUrl} alt="Event" className="w-16 h-16 rounded-full shadow col-span-1"/>
         <h2 className="text-lg font-semibold col-span-1">{event.title}</h2>
         <p className="col-span-1">{event.date.replace("T", " ")}</p>
         <p className="col-span-1">{event.location}</p>
