@@ -6,7 +6,7 @@ const MainContent = React.lazy(() => import('./_components/mainContent'));
 const AdminNavbar = React.lazy(() => import('./_components/adminNavbar'));
 
 
-function AdminLayout() {
+function AdminLayout({ children }) {
   const [selectedPage, setSelectedPage] = useState('Dashboard'); 
 
   const loader = (
@@ -22,6 +22,7 @@ function AdminLayout() {
         <main className="flex-1 overflow-y-auto bg-gray-400"> 
           {/* <AdminNavbar/>  */}
           <MainContent selectedPage={selectedPage} />
+          { children }
         </main>
       </div>
     </Suspense>

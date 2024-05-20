@@ -1,7 +1,9 @@
 'use-client'
 
+import { Button } from "@/components/ui/button"
 import { db } from "@/firebase.config"
 import { collection, onSnapshot, query } from "firebase/firestore"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 
@@ -48,9 +50,11 @@ function EventList() {
         <span>{event.registrants}/{event.limit}</span>
         {event.registrants >= event.limit && <span className="ml-2 text-red-500">(Full)</span>}
       </div>
-      <button type="submit" className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out col-span-1">
-        Edit
-      </button>
+      <Button asChild type="submit" className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out col-span-1">
+        <Link href={`/admin/${event.id}`}>
+          <p>Edit</p>
+        </Link>
+      </Button>
       </div>
     ))}
     </div>
