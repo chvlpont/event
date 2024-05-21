@@ -25,6 +25,7 @@ export async function createEvent(title, date, description, imageFile, category,
       category,
       location,
       numberOfSeats,
+      bookedUsers: [] // Initialize bookedUsers as an empty array
     };
 
     const eventRef = await addDoc(eventsCollection, newEvent);
@@ -35,10 +36,6 @@ export async function createEvent(title, date, description, imageFile, category,
     throw error;
   }
 }
-
-
-
-
 
 // Function to retrieve all events
 export async function getEvents() {
@@ -143,7 +140,6 @@ export async function bookEventForUser(eventId) {
     throw error;
   }
 }
-
 
 // Function to get events booked by a Clerk user
 export async function getBookedEventsForUser() {
