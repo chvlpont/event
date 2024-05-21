@@ -2,7 +2,7 @@
 import React from "react";
 import LandingPage from "./_components/landing-page";
 import { auth } from "@/firebase.config";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { signInWithCustomToken } from "firebase/auth";
 import { useEffect } from "react";
 

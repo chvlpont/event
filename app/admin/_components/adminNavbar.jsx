@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserButton, useUser } from '@clerk/clerk-react';
+import { useUser, UserButton } from "@clerk/nextjs";
 
 
 function AdminNavbar() {
