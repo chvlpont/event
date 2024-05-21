@@ -1,5 +1,5 @@
 import React from 'react';
-import EventList from '../_components/eventList';
+import EventList from '../../_components/eventList';
 
 function EditEvent() {
   return (

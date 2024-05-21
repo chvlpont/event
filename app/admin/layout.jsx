@@ -6,8 +6,7 @@ const MainContent = React.lazy(() => import('./_components/mainContent'));
 const AdminNavbar = React.lazy(() => import('./_components/adminNavbar'));
 
 
-function AdminLayout() {
-  const [selectedPage, setSelectedPage] = useState('Dashboard'); 
+function AdminLayout({ children }) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -27,10 +26,11 @@ function AdminLayout() {
   return (
     <Suspense fallback={loader}>
       <div className="flex h-screen overflow-hidden">
-        <Sidebar setSelectedPage={setSelectedPage} />
-        <main className="flex-1 overflow-y-auto bg-gray-400"> 
-          <AdminNavbar/> 
-          <MainContent selectedPage={selectedPage} />
+        <Sidebar />
+        <main className="flex-1 overflow-y-auto bg-gray-400">
+          <AdminNavbar />
+         
+          {children}
         </main>
       </div>
     </Suspense>

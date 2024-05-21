@@ -1,3 +1,4 @@
+'use client'
 import React, { useState } from 'react';
 import { IoEllipsisVerticalOutline } from "react-icons/io5";
 
