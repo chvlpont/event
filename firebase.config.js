@@ -23,7 +23,7 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 // Communicates with NoSQL database
 const db = getFirestore(app);
 
-// Do we need storage?
+// Communicates with firebase storage
 const storage = getStorage(app);
 
 // Connect to Firebase auth
