@@ -2,7 +2,7 @@ import {
   fetchAdminIds,
   fetchUserData,
   fetchNonAdminUserData,
-} from "../../utils/dataFetching";
+} from "../dataFetching";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {

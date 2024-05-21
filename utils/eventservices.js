@@ -3,7 +3,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
 import { useClerk } from '@clerk/nextjs'; // Import Clerk hook for authentication
 
-
 export async function createEvent(title, date, description, imageFile, category, location, numberOfSeats) {
   try {
     if (!imageFile) {
@@ -25,6 +24,7 @@ export async function createEvent(title, date, description, imageFile, category,
       category,
       location,
       numberOfSeats,
+      bookedUsers: [] // Initialize bookedUsers as an empty array
     };
 
     const eventRef = await addDoc(eventsCollection, newEvent);
@@ -35,10 +35,6 @@ export async function createEvent(title, date, description, imageFile, category,
     throw error;
   }
 }
-
-
-
-
 
 // Function to retrieve all events
 export async function getEvents() {
@@ -88,7 +84,6 @@ export async function updateEvent(eventId, updatedData) {
     throw error;
   }
 }
-
 
 // Function to delete an event
 export async function deleteEvent(eventId) {
@@ -144,7 +139,6 @@ export async function bookEventForUser(eventId) {
   }
 }
 
-
 // Function to get events booked by a Clerk user
 export async function getBookedEventsForUser() {
   try {
@@ -196,3 +190,36 @@ export async function cancelBookingForUser(eventId) {
     throw error;
   }
 }
+
+// Function to get all users booked for a specific event
+export async function getBookedUsersForEvent(eventId) {
+  try {
+    const eventRef = doc(db, "events", eventId);
+    const eventDoc = await getDoc(eventRef);
+
+    if (eventDoc.exists()) {
+      const eventData = eventDoc.data();
+      const bookedUsers = eventData.bookedUsers || [];
+      return bookedUsers;
+    } else {
+      console.log("Event does not exist.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting booked users for event:", error);
+    throw error;
+  }
+}
+
+// Example usage
+async function exampleUsage() {
+  const eventId = "your-event-id"; // Replace with your actual event ID
+  try {
+    const bookedUsers = await getBookedUsersForEvent(eventId);
+    console.log("Booked users:", bookedUsers);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+exampleUsage();
