@@ -2,7 +2,7 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { events } from '@/components/eventList';
+import EventList from '../../_components/eventList';
 import { FaUpload } from "react-icons/fa";
 
 function EventDetailPage() {

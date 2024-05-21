@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from "react";
 import { IoEllipsisVerticalOutline } from "react-icons/io5";
 import { useAuth } from "@clerk/nextjs";
