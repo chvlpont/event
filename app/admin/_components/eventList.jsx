@@ -58,8 +58,8 @@ function EventList() {
         <p className="col-span-1">{event.location}</p>
         <p className="line-clamp-2 col-span-1">{event.description}</p>
       <div className="flex items-center justify-center col-span-1">
-        <span>{event.registrants}/{event.limit}</span>
-        {event.registrants >= event.limit && <span className="ml-2 text-red-500">(Full)</span>}
+        <span>{event.registrants}/{event.numberOfSeats}</span>
+        {event.registrants >= event.numberOfSeats && <span className="ml-2 text-red-500">(Full)</span>}
       </div>
       <div className="flex justify-center gap-2">
         <Button asChild type="submit" className="w-full h-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out col-span-1">
