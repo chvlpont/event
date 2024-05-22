@@ -74,9 +74,19 @@ export async function getEventById(eventId) {
 }
 
 // Function to update an existing event
-export async function updateEvent(eventId, updatedData) {
+export async function updateEvent(eventId, updatedData, imageFile = null) {
   try {
     const eventRef = doc(db, "events", eventId);
+    
+    // If imageFile is provided, update the image
+    if (imageFile) {
+      const imageRef = ref(storage, `images/${imageFile.name}`);
+      await uploadBytes(imageRef, imageFile);
+      
+      // Get download URL of the uploaded image
+      updatedData.imageUrl = await getDownloadURL(imageRef);
+    }
+    
     await updateDoc(eventRef, updatedData);
     console.log("Event updated successfully!");
   } catch (error) {
@@ -84,6 +94,7 @@ export async function updateEvent(eventId, updatedData) {
     throw error;
   }
 }
+
 
 // Function to delete an event
 export async function deleteEvent(eventId) {
