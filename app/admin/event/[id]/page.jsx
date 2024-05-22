@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { getEventById, updateEvent } from '@/utils/eventservices';
+import { deleteEvent, getEventById, updateEvent } from '@/utils/eventservices';
 import { useRouter } from "next/navigation"
 
 function EventDetailPage({ params }) {
@@ -21,6 +21,11 @@ function EventDetailPage({ params }) {
   });
 
   useEffect(() => {
+    if (!params.id) {
+      setLoading(false);
+      return; // Exit useEffect
+    }
+
     async function fetchEvent() {
       try {
         const eventData = await getEventById(params.id);
@@ -45,8 +50,12 @@ function EventDetailPage({ params }) {
     fetchEvent();
   }, [params.id]);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!params.id || loading) {
+    return (
+      <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
+        {params.id ? <div>Loading...</div> : <div className="text-red-500">Event not found.</div>}
+      </div>
+    );
   }
 
   const handleChange = (e) => {
@@ -84,9 +93,22 @@ function EventDetailPage({ params }) {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteEvent(params.id);
+      router.back();
+      console.log('Event Deleted! Event ID:', params.id);
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      // Handle error, maybe display an error message to the user
+    }
+  };
+
   return (
 
     <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
+      {event ? (
+      <>
       <h2 className="text-4xl font-bold text-center mb-6 ">Edit Event</h2>
       <form onSubmit={handleSubmit} className="w-full max-w-lg bg-blue-700 dark:bg-gray-200 p-8 rounded-lg shadow-lg">
         <label className="block mb-4">
@@ -164,15 +186,26 @@ function EventDetailPage({ params }) {
             className="form-input mt-1 block w-full bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50 p-2 rounded"
             multiple
           />
-          <img src={previewImage || event?.imageUrl} alt="Event" className="w-16 h-16 rounded-full shadow"/>
         </label>
+        <img src={previewImage || event?.imageUrl} alt="Event" className="w-16 h-16 rounded-full shadow"/>
         <button
           type="submit"
           className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out"
         >
           Update Event
         </button>
+        <button
+          type="button"
+          onClick={handleDelete}
+          className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
+        >
+          Delete Event
+        </button>
       </form>
+    </>
+    ) : (
+      <div className="text-red-500">Event not found.</div>
+      )}
     </div>
   )
 }
