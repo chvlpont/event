@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 function EventDetailPage({ params }) {
 
   const router = useRouter()
-
+  
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
@@ -21,11 +21,6 @@ function EventDetailPage({ params }) {
   });
 
   useEffect(() => {
-    if (!params.id) {
-      setLoading(false);
-      return; // Exit useEffect
-    }
-
     async function fetchEvent() {
       try {
         const eventData = await getEventById(params.id);
@@ -50,10 +45,10 @@ function EventDetailPage({ params }) {
     fetchEvent();
   }, [params.id]);
 
-  if (!params.id || loading) {
+  if (loading) {
     return (
       <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
-        {params.id ? <div>Loading...</div> : <div className="text-red-500">Event not found.</div>}
+        <div>Loading...</div>
       </div>
     );
   }
@@ -94,6 +89,10 @@ function EventDetailPage({ params }) {
   };
 
   const handleDelete = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this event?");
+    if (!confirmDelete) {
+      return; // If user cancels deletion, do nothing
+    }
     try {
       await deleteEvent(params.id);
       router.back();
@@ -197,7 +196,7 @@ function EventDetailPage({ params }) {
         <button
           type="button"
           onClick={handleDelete}
-          className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
+          className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-red-500 dark:hover:bg-red-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
         >
           Delete Event
         </button>
