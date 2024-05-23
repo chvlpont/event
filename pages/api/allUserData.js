@@ -1,10 +1,10 @@
-import { fetchAllUsers } from "../../utils/dataFetching";
+import { fetchAllUsernames } from "../../utils/dataFetching";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
-      const allUsers = await fetchAllUsers();
-      res.status(200).json({ users: allUsers });
+      const allUsernames = await fetchAllUsernames();
+      res.status(200).json({ usernames: allUsernames });
     } catch (error) {
       res.status(500).json({ error: "Internal server error" });
     }
