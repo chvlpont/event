@@ -34,6 +34,37 @@ function CreateEvent() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const { title, location, category, date, description, numberOfSeats, imageFile } = formData;
+
+     // Check if all fields have been filled
+  if (title === '') {
+    toast.error('Please enter a title.');
+    return;
+  }
+  if (location === '') {
+    toast.error('Please enter a location.');
+    return;
+  }
+  if (category === '') {
+    toast.error('Please select a category.');
+    return;
+  }
+  if (date === '') {
+    toast.error('Please select a date.');
+    return;
+  }
+  if (description === '') {
+    toast.error('Please enter a description.');
+    return;
+  }
+  if (numberOfSeats === '') {
+    toast.error('Please enter the number of seats.');
+    return;
+  }
+  if (imageFile === null) {
+    toast.error('Please upload an image.');
+    return;
+  }
     try {
       const { title, location, category, date, description, numberOfSeats, imageFile } = formData;
       const eventId = await createEvent(title, date, description, imageFile, category, location, numberOfSeats);
