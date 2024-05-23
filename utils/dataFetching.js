@@ -72,16 +72,18 @@ export async function fetchNonAdminUserData() {
   }
 }
 
-// Function to fetch all user data
-export async function fetchAllUsers() {
+// Function to fetch all usernames
+export async function fetchAllUsernames() {
   try {
     // Fetch the list of all users
     const userListResponse = await clerkClient.users.getUserList();
-    const allUsers = userListResponse.data; // Access the data array
+    const allUsernames = userListResponse.data
+      .map((user) => user.username)
+      .filter((username) => username); // Filter out any null or empty usernames
 
-    return allUsers;
+    return allUsernames;
   } catch (error) {
-    console.error("Error fetching all users:", error);
+    console.error("Error fetching all usernames:", error);
     throw error; // Rethrow the error after logging it
   }
 }
