@@ -3,7 +3,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
 import { useClerk } from '@clerk/nextjs'; // Import Clerk hook for authentication
 
-
 export async function createEvent(title, date, description, imageFile, category, location, numberOfSeats) {
   try {
     if (!imageFile) {
@@ -75,9 +74,19 @@ export async function getEventById(eventId) {
 }
 
 // Function to update an existing event
-export async function updateEvent(eventId, updatedData) {
+export async function updateEvent(eventId, updatedData, imageFile = null) {
   try {
     const eventRef = doc(db, "events", eventId);
+    
+    // If imageFile is provided, update the image
+    if (imageFile) {
+      const imageRef = ref(storage, `images/${imageFile.name}`);
+      await uploadBytes(imageRef, imageFile);
+      
+      // Get download URL of the uploaded image
+      updatedData.imageUrl = await getDownloadURL(imageRef);
+    }
+    
     await updateDoc(eventRef, updatedData);
     console.log("Event updated successfully!");
   } catch (error) {
@@ -192,3 +201,36 @@ export async function cancelBookingForUser(eventId) {
     throw error;
   }
 }
+
+// Function to get all users booked for a specific event
+export async function getBookedUsersForEvent(eventId) {
+  try {
+    const eventRef = doc(db, "events", eventId);
+    const eventDoc = await getDoc(eventRef);
+
+    if (eventDoc.exists()) {
+      const eventData = eventDoc.data();
+      const bookedUsers = eventData.bookedUsers || [];
+      return bookedUsers;
+    } else {
+      console.log("Event does not exist.");
+      return [];
+    }
+  } catch (error) {
+    console.error("Error getting booked users for event:", error);
+    throw error;
+  }
+}
+
+// Example usage
+async function exampleUsage() {
+  const eventId = "your-event-id"; // Replace with your actual event ID
+  try {
+    const bookedUsers = await getBookedUsersForEvent(eventId);
+    console.log("Booked users:", bookedUsers);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+exampleUsage();
