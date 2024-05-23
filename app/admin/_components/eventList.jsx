@@ -39,11 +39,10 @@ function EventList({ searchTerm }) {
     try {
       await deleteEvent(eventToDelete);
       console.log('Event Deleted! Event ID:', eventToDelete);
+      closeModal();
     } catch (error) {
       console.error('Failed to delete event:', error);
-      // Handle error, maybe display an error message to the user
     }
-    closeModal();
   };
 
   const openModal = (id) => {
@@ -52,8 +51,8 @@ function EventList({ searchTerm }) {
   };
   
   const closeModal = () => {
-    setEventToDelete(null);
     setModalIsOpen(false);
+    setTimeout(() => setEventToDelete(null), 300); // Ensure modal is closed before resetting event to delete
   };
 
   return (
