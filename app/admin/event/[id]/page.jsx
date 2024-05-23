@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { deleteEvent, getEventById, updateEvent } from '@/utils/eventservices';
 import { useRouter } from "next/navigation"
+import Modal from 'react-modal';
 
 function EventDetailPage({ params }) {
 
@@ -10,6 +11,8 @@ function EventDetailPage({ params }) {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     location: '',
@@ -87,20 +90,30 @@ function EventDetailPage({ params }) {
       // Handle error, maybe display an error message to the user
     }
   };
-
   const handleDelete = async () => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this event?");
-    if (!confirmDelete) {
-      return; // If user cancels deletion, do nothing
-    }
     try {
-      await deleteEvent(params.id);
-      router.back();
-      console.log('Event Deleted! Event ID:', params.id);
+      if (typeof eventToDelete === 'string') {
+        await deleteEvent(eventToDelete);
+        console.log('Event Deleted! Event ID:', eventToDelete);
+        router.push('/admin/event/edit'); // navigate to the all events page
+      } else {
+        console.error('eventToDelete is not a string:', eventToDelete);
+      }
     } catch (error) {
       console.error('Failed to delete event:', error);
       // Handle error, maybe display an error message to the user
     }
+    closeModal();
+  };
+
+  const openModal = (id) => {
+    setEventToDelete(id);
+    setModalIsOpen(true);
+  };
+  
+  const closeModal = () => {
+    setEventToDelete(null);
+    setModalIsOpen(false);
   };
 
   return (
@@ -194,17 +207,47 @@ function EventDetailPage({ params }) {
           Update Event
         </button>
         <button
-          type="button"
-          onClick={handleDelete}
-          className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-red-500 dark:hover:bg-red-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
-        >
-          Delete Event
-        </button>
-      </form>
-    </>
+            type="button"
+            onClick={() => openModal(event.id)}
+            className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-red-500 dark:hover:bg-red-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
+          >
+            Delete Event
+          </button>
+        </form>
+        <Modal
+ isOpen={modalIsOpen}
+ onRequestClose={closeModal}
+ contentLabel="Delete Event Confirmation"
+ style={{
+   overlay: {
+     backgroundColor: 'rgba(107, 114, 128, 0.75)' // This is the Tailwind color 'bg-gray-600' with 75% opacity
+   },
+   content: {
+     top: '50%',
+     left: '50%',
+     right: 'auto',
+     bottom: 'auto',
+     marginRight: '-50%',
+     transform: 'translate(-50%, -50%)',
+     backgroundColor: '#1F2937', // This is the Tailwind color 'bg-gray-800'
+     padding: '2rem', // This is the Tailwind size 'p-8'
+     borderRadius: '0.5rem', // This is the Tailwind size 'rounded-lg'
+     color: '#F3F4F6', // This is the Tailwind color 'text-gray-200'
+   }
+ }}
+>
+<div className="bg-gray-800 p-4 rounded flex flex-col items-center">
+    <h2 className="mb-4">Are you sure you want to delete this event?</h2>
+    <div>
+      <button className="bg-red-500 text-white py-2 px-4 rounded mr-2" onClick={handleDelete}>Yes, delete it</button>
+      <button className="bg-green-500 text-white py-2 px-4 rounded" onClick={closeModal}>No, keep it</button>
+    </div>
+  </div>
+</Modal>
+      </>
     ) : (
       <div className="text-red-500">Event not found.</div>
-      )}
+    )}
     </div>
   )
 }
