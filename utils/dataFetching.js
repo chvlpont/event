@@ -72,34 +72,13 @@ export async function fetchNonAdminUserData() {
   }
 }
 
-export async function fetchBookedUsernames(eventId) {
+// Fetch all clerk users
+export async function getAllUsers() {
   try {
-    // Fetch the event document from Firestore
-    const eventDoc = await db.collection("events").doc(eventId).get();
-    const eventData = eventDoc.data();
-
-    // If the event has booked users, fetch their usernames from Clerk
-    if (eventData && eventData.bookedUsers) {
-      const bookedUserIds = eventData.bookedUsers;
-
-      // Fetch user details for each booked user ID from Clerk
-      const userDetailsPromises = bookedUserIds.map((userId) =>
-        clerkClient.users.getUser(userId)
-      );
-      const userDetails = await Promise.all(userDetailsPromises);
-
-      // Extract usernames from user details
-      const bookedUsernames = userDetails
-        .map((user) => user.username)
-        .filter((username) => username);
-
-      return bookedUsernames;
-    } else {
-      // No booked users for this event
-      return [];
-    }
+    const response = await clerkClient.users.getUserList();
+    return response;
   } catch (error) {
-    console.error("Error fetching booked user data:", error);
-    throw new Error("Failed to fetch booked user data");
+    console.error("Error fetching user list:", error);
+    throw error;
   }
 }

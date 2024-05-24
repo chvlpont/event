@@ -1,12 +1,28 @@
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
-import { useClerk } from '@clerk/nextjs'; // Import Clerk hook for authentication
+import { useClerk } from "@clerk/nextjs"; // Import Clerk hook for authentication
 
-export async function createEvent(title, date, description, imageFile, category, location, numberOfSeats) {
+export async function createEvent(
+  title,
+  date,
+  description,
+  imageFile,
+  category,
+  location,
+  numberOfSeats
+) {
   try {
     if (!imageFile) {
-      throw new Error('Image file is required.');
+      throw new Error("Image file is required.");
     }
 
     const imageRef = ref(storage, `images/${imageFile.name}`);
@@ -24,7 +40,7 @@ export async function createEvent(title, date, description, imageFile, category,
       category,
       location,
       numberOfSeats,
-      bookedUsers: [] // Initialize bookedUsers as an empty array
+      bookedUsers: [], // Initialize bookedUsers as an empty array
     };
 
     const eventRef = await addDoc(eventsCollection, newEvent);
@@ -61,7 +77,7 @@ export async function getEventById(eventId) {
     if (docSnapshot.exists()) {
       return {
         id: docSnapshot.id,
-        ...docSnapshot.data()
+        ...docSnapshot.data(),
       };
     } else {
       console.log("No such event document!");
@@ -77,16 +93,16 @@ export async function getEventById(eventId) {
 export async function updateEvent(eventId, updatedData, imageFile = null) {
   try {
     const eventRef = doc(db, "events", eventId);
-    
+
     // If imageFile is provided, update the image
     if (imageFile) {
       const imageRef = ref(storage, `images/${imageFile.name}`);
       await uploadBytes(imageRef, imageFile);
-      
+
       // Get download URL of the uploaded image
       updatedData.imageUrl = await getDownloadURL(imageRef);
     }
-    
+
     await updateDoc(eventRef, updatedData);
     console.log("Event updated successfully!");
   } catch (error) {
@@ -94,7 +110,6 @@ export async function updateEvent(eventId, updatedData, imageFile = null) {
     throw error;
   }
 }
-
 
 // Function to delete an event
 export async function deleteEvent(eventId) {
@@ -137,7 +152,7 @@ export async function bookEventForUser(eventId) {
 
       // Update the event document with the new 'bookedUsers' array
       await updateDoc(eventRef, {
-        bookedUsers: bookedUsers
+        bookedUsers: bookedUsers,
       });
 
       console.log("User successfully booked for the event.");
@@ -161,7 +176,9 @@ export async function getBookedEventsForUser() {
         id: doc.id,
         ...doc.data(),
       }))
-      .filter((event) => event.bookedUsers && event.bookedUsers.includes(user.id));
+      .filter(
+        (event) => event.bookedUsers && event.bookedUsers.includes(user.id)
+      );
     return bookedEvents;
   } catch (error) {
     console.error("Error getting booked events for user:", error);
@@ -185,11 +202,13 @@ export async function cancelBookingForUser(eventId) {
       }
 
       // Remove the user from the 'bookedUsers' array
-      const updatedBookedUsers = eventData.bookedUsers.filter((userId) => userId !== user.id);
+      const updatedBookedUsers = eventData.bookedUsers.filter(
+        (userId) => userId !== user.id
+      );
 
       // Update the event document with the updated 'bookedUsers' array
       await updateDoc(eventRef, {
-        bookedUsers: updatedBookedUsers
+        bookedUsers: updatedBookedUsers,
       });
 
       console.log("Booking canceled successfully.");
@@ -222,15 +241,15 @@ export async function getBookedUsersForEvent(eventId) {
   }
 }
 
-// Example usage
-async function exampleUsage() {
-  const eventId = "your-event-id"; // Replace with your actual event ID
-  try {
-    const bookedUsers = await getBookedUsersForEvent(eventId);
-    console.log("Booked users:", bookedUsers);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
+// // Example usage
+// async function exampleUsage() {
+//   const eventId = "your-event-id"; // Replace with your actual event ID
+//   try {
+//     const bookedUsers = await getBookedUsersForEvent(eventId);
+//     console.log("Booked users:", bookedUsers);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// }
 
-exampleUsage();
+// exampleUsage();
