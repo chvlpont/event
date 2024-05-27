@@ -71,3 +71,14 @@ export async function fetchNonAdminUserData() {
     throw new Error("Failed to fetch non-admin user data");
   }
 }
+
+// Fetch all clerk users
+export async function getAllUsers() {
+  try {
+    const response = await clerkClient.users.getUserList();
+    return response;
+  } catch (error) {
+    console.error("Error fetching user list:", error);
+    throw error;
+  }
+}

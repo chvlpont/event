@@ -1,49 +1,60 @@
 
 'use client';
-import React from 'react';
-import Link from 'next/link';
+import { db } from "@/firebase.config"
+import { collection, onSnapshot, query } from "firebase/firestore"
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { IoEllipsisVerticalOutline } from "react-icons/io5";
+import { deleteEvent} from '@/utils/eventservices';
+import Modal from 'react-modal';
 
-export const events = [
-  {
-    id: 1,
-    category: 'Music',
-    title: 'Music Festival',
-    date: '2024-06-01',
-    location: 'Central Park, New York',
-    description: 'Join us for a day of amazing music and fun!',
-    registrants: 4500,
-    limit: 5000,
-    image: 'https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  },
-  {
-    id: 2,
-    category: 'Art',
-    title: 'Art Exhibition',
-    date: '2024-07-30',
-    location: 'Modern Art Museum, San Francisco',
-    description: 'Experience the best of contemporary art at our annual exhibition.',
-    registrants: 200,
-    limit: 200,
-    image: 'https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  },
-  {
-    id: 3,
-    category: 'Tech',
-    title: 'Tech Conference',
-    date: '2024-08-03',
-    location: 'Convention Center, Austin',
-    description: 'The biggest tech conference of the year. Don\'t miss it!',
-    registrants: 800,
-    limit: 1000,
-    image: 'https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-  },
-  // Add more events...
-];
 
 function EventList({ searchTerm }) {
-  const filteredEvents = events.filter(event =>
+
+  const [eventList, setEventList] = useState([])
+  const [ loading, setLoading ] = useState(true)
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'events'));
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      const events = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setLoading(false)
+      setEventList(events);
+    });
+  
+    return () => unsub();
+  }, []);
+
+  const filteredEvents = eventList.filter(event =>
     event.title.toLowerCase().includes((searchTerm || '').toLowerCase())
   );
+
+  const handleDelete = async () => {
+    try {
+      await deleteEvent(eventToDelete);
+      console.log('Event Deleted! Event ID:', eventToDelete);
+      closeModal();
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
+  const openModal = (id) => {
+    setEventToDelete(id);
+    setModalIsOpen(true);
+  };
+  
+  const closeModal = () => {
+    setModalIsOpen(false);
+    setTimeout(() => setEventToDelete(null), 300); // Ensure modal is closed before resetting event to delete
+  };
+
   return (
     <div className="divide-y divide-gray-700">
       <div className="bg-gray-800 p-4 rounded-t-lg shadow-lg grid grid-cols-7 items-center font-bold">
@@ -53,34 +64,74 @@ function EventList({ searchTerm }) {
         <p className="text-blue-500 font-semibold text-center">Location</p>
         <p className="text-blue-500 font-semibold text-center ">Category</p>
         <p className="text-blue-500 font-semibold text-center">Registrants</p>
-        <p className="text-blue-500 font-semibold text-center">Actions</p>
+        <p className="text-blue-500 font-semibold text-right">Actions</p>
       </div>
       {filteredEvents.length > 0 ? filteredEvents.map((event, index) => (
-        <div key={event.id} className={`bg-gray-800 p-4 shadow-lg grid grid-cols-7 gap-4 items-center ${index === filteredEvents.length - 1 ? 'rounded-b-lg' : ''}`}>
-          <div className="flex justify-center items-center col-span-1">
-            <img src={event.image} alt="Event" className="w-16 h-16 rounded-full shadow"/>
+<div key={event.id} className={`bg-gray-800 p-4 shadow-lg grid grid-cols-7 gap-x-6 items-center ${index === filteredEvents.length - 1 ? 'rounded-b-lg' : ''}`}>
+                  <div className="flex justify-center items-center col-span-1 px-2">
+            <img src={event.imageUrl} alt="Event" className="w-16 h-16 rounded-full shadow"/>
           </div>
           <h2 className="text-lg font-semibold col-span-1 text-center text-white">{event.title}</h2>
-          <p className="col-span-1 text-center text-white">{event.date}</p>
+          <p className="col-span-1 text-center text-white">{event.date.replace("T", " ")}</p>
           <p className="col-span-1 text-center text-white">{event.location}</p>
           <p className="line-clamp-2 col-span-1 text-center text-white">{event.category}</p>
           <div className="flex items-center justify-center col-span-1 text-white">
-            <span>{event.registrants}/{event.limit}</span>
-            {event.registrants >= event.limit && <span className="ml-2 text-red-500">(Full)</span>}
+            <span>{event.bookedUsers?.length}/{event.numberOfSeats}</span>
+            {event.bookedUsers?.length >= event.numberOfSeats && <span className="ml-2 text-red-500">(Full)</span>}
           </div>
-          <Link href={`/admin/event/${event.id}`} passHref>
-            <button
-              className="w-full py-3 px-4 bg-blue-600 text-gray-200 rounded hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out col-span-1"
-            >
-              Edit
-            </button>
-          </Link>
+          <div className="col-span-1 flex justify-end">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <IoEllipsisVerticalOutline />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-900 rounded p-2 shadow-2xl">
+              <Link href={`/admin/event/${event.id}`} passHref>
+  <DropdownMenuItem className="cursor-pointer">
+    <button>Edit</button>
+  </DropdownMenuItem>
+</Link>
+<DropdownMenuItem className="cursor-pointer" onClick={() => openModal(event.id)}>
+  Delete
+</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       )) : (
         <div className="text-center py-10">
           <p>No events found that match your search criteria.</p>
-        </div>
+          </div>
       )}
+<Modal
+ isOpen={modalIsOpen}
+ onRequestClose={closeModal}
+ contentLabel="Delete Event Confirmation"
+ style={{
+   overlay: {
+     backgroundColor: 'rgba(107, 114, 128, 0.75)' // This is the Tailwind color 'bg-gray-600' with 75% opacity
+   },
+   content: {
+     top: '50%',
+     left: '50%',
+     right: 'auto',
+     bottom: 'auto',
+     marginRight: '-50%',
+     transform: 'translate(-50%, -50%)',
+     backgroundColor: '#1F2937', // This is the Tailwind color 'bg-gray-800'
+     padding: '2rem', // This is the Tailwind size 'p-8'
+     borderRadius: '0.5rem', // This is the Tailwind size 'rounded-lg'
+     color: '#F3F4F6', // This is the Tailwind color 'text-gray-200'
+   }
+ }}
+>
+<div className="bg-gray-800 p-4 rounded flex flex-col items-center">
+    <h2 className="mb-4">Are you sure you want to delete this event?</h2>
+    <div>
+      <button className="bg-red-500 text-white py-2 px-4 rounded mr-2" onClick={handleDelete}>Yes, delete it</button>
+      <button className="bg-green-500 text-white py-2 px-4 rounded" onClick={closeModal}>No, keep it</button>
+    </div>
+  </div>
+</Modal>
     </div>
   );
 }

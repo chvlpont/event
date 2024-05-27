@@ -1,207 +1,301 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import { deleteEvent, getEventById, updateEvent } from "@/utils/eventservices";
+import { useRouter } from "next/navigation";
+import Modal from "react-modal";
 
-'use client';
-import React, { useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
-import EventList from '../../_components/eventList';
-import { FaUpload } from "react-icons/fa";
+function EventDetailPage({ params }) {
+  const router = useRouter();
 
-function EventDetailPage() {
-  const { id } = useParams();  // Correct use of useParams from next/navigation
-  const event = events.find(event => event.id === parseInt(id, 10));  // use parseInt to convert id to number
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    location: "",
+    category: "",
+    date: "",
+    description: "",
+    numberOfSeats: "",
+    imageFile: null,
+  });
+  const [bookedUsernames, setBookedUsernames] = useState([]);
 
-  if (!event) {
-    return <p>No event found with ID {id}</p>;
+  useEffect(() => {
+    async function fetchEvent() {
+      try {
+        const eventData = await getEventById(params.id);
+        console.log("Event data:", eventData.bookedUsers);
+        setEvent(eventData);
+        setFormData({
+          title: eventData.title,
+          location: eventData.location,
+          category: eventData.category,
+          date: eventData.date,
+          description: eventData.description,
+          numberOfSeats: eventData.numberOfSeats,
+          imageFile: null,
+        });
+        setPreviewImage(eventData.imageUrl);
+
+        // Fetch all users and filter the booked users
+        const response = await fetch("/api/allUserData");
+        const data = await response.json();
+        const allUsers = data.data;
+        const bookedUserIds = eventData.bookedUsers;
+        const bookedUsers = allUsers.filter((user) =>
+          bookedUserIds.includes(user.id)
+        );
+        const bookedUsernames = bookedUsers.map((user) => user.username);
+
+        setBookedUsernames(bookedUsernames);
+
+        // Log the usernames of booked users
+        console.log("Booked user usernames:", bookedUsernames);
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching event:", error);
+        setLoading(false);
+      }
+    }
+
+    fetchEvent();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
+        <div>Loading...</div>
+      </div>
+    );
   }
 
-  const handleSave = (updatedEvent) => {
-    // Implement the logic to save the updated event to the database
-    console.log(updatedEvent);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
-
-  return <EventDetails event={event} onSave={handleSave} />;
-}
-
-const EventDetails = ({ event, onSave }) => {
-  const { title, image, location, date, registrants, limit, description, category } = event;
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [newTitle, setNewTitle] = useState(title);
-  const [newLocation, setNewLocation] = useState(location);
-  const [newDate, setNewDate] = useState(date);
-  const [newRegistrants, setNewRegistrants] = useState(registrants);
-  const [newLimit, setNewLimit] = useState(limit);
-  const [newDescription, setNewDescription] = useState(description);
-  const [newCategory, setNewCategory] = useState(category);
-  const limitInputRef = useRef(); 
-  const [newImage, setNewImage] = useState(image);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const [registeredUsers, setRegisteredUsers] = useState([
-    { name: 'John Doe', email: 'john.doe@example.com' },
-    { name: 'Jane Smith', email: 'jane.smith@example.com' },
-    { name: 'Robert Johnson', email: 'robert.johnson@example.com' },
-    { name: 'Emily Davis', email: 'emily.davis@example.com' },
-    { name: 'Michael Brown', email: 'michael.brown@example.com' },
-    { name: 'Sarah Miller', email: 'sarah.miller@example.com' },
-    { name: 'James Wilson', email: 'james.wilson@example.com' },
-    // Add more users as needed
-  ]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+    setFormData({
+      ...formData,
+      imageFile: file,
+    });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { imageFile, ...updatedData } = formData;
+    try {
+      await updateEvent(params.id, updatedData, imageFile);
+      router.back();
+      console.log("Event Updated! Event ID:", params.id);
+    } catch (error) {
+      console.error("Failed to update event:", error);
+      // Handle error, maybe display an error message to the user
     }
   };
-
-  const handleBlur = (setter) => (e) => {
-    setter(e.target.innerText);
+  const handleDelete = async () => {
+    try {
+      if (typeof eventToDelete === "string") {
+        await deleteEvent(eventToDelete);
+        console.log("Event Deleted! Event ID:", eventToDelete);
+        router.push("/admin/event/edit"); // navigate to the all events page
+      } else {
+        console.error("eventToDelete is not a string:", eventToDelete);
+      }
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+      // Handle error, maybe display an error message to the user
+    }
+    closeModal();
   };
 
-  const handleSave = () => {
-    onSave({ title: newTitle, image: newImage, location: newLocation, date: newDate, registrants: newRegistrants, limit: newLimit, description: newDescription, category: newCategory });
-    setIsEditing(false);
+  const openModal = (id) => {
+    setEventToDelete(id);
+    setModalIsOpen(true);
   };
 
-  const handleDelete = () => {
-    // Implement the logic to delete the event from the database
-    console.log('Event deleted');
-    setIsDeleteModalOpen(false);
+  const closeModal = () => {
+    setEventToDelete(null);
+    setModalIsOpen(false);
   };
 
   return (
-    <div className="p-8 relative">
-      <div className="flex">
-        <div className="w-1/2 relative">
-          {isEditing ? 
-            <div>
-              <img className="w-full h-80 object-fill" src={newImage} alt="Event" />
-              <label className="absolute bottom-0 mb-[48px] left-1/2 transform -translate-x-1/2 w-1/4 text-white cursor-pointer bg-blue-500 hover:bg-blue-600 py-2 flex justify-center items-center rounded">
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleImageChange} 
-                  className="hidden"
-                />
-                <FaUpload className="mr-2" /> Upload Image
-              </label>
-            </div> : 
-            <img className="w-full h-80 object-fill" src={image} alt="Event" />
-          }
-        </div>
-        <div className="w-1/2 pl-8">
-          <h1 
-            className="text-4xl mb-4 text-white" 
-            contentEditable={isEditing} 
-            onBlur={handleBlur(setNewTitle)} 
-            suppressContentEditableWarning 
-            style={isEditing ? { display: 'inline-block' } : {}}
+    <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
+      {event ? (
+        <>
+          <h2 className="text-4xl font-bold text-center mb-6 ">Edit Event</h2>
+          <form
+            onSubmit={handleSubmit}
+            className="w-full max-w-lg bg-blue-700 dark:bg-gray-200 p-8 rounded-lg shadow-lg"
           >
-            {title}
-          </h1>
-          <p className={`text-white ${isEditing ? 'cursor-pointer' : ''}`}>
-            Location:  <span contentEditable={isEditing} onBlur={handleBlur(setNewLocation)} suppressContentEditableWarning>{location}</span>
-          </p>
-          <p className={`text-white ${isEditing ? 'cursor-pointer' : ''}`}>
-            Category:  <span contentEditable={isEditing} onBlur={handleBlur(setNewCategory)} suppressContentEditableWarning>{newCategory}</span>
-          </p>
-          <p className="text-white">
-            Date: 
-            {isEditing ? 
-              <input 
-                type="date" 
-                defaultValue={newDate} 
-                onBlur={(e) => setNewDate(e.target.value)} 
-                className="bg-transparent  w-28 cursor-pointer"
-              /> : 
-              <span>{date}</span>
-            }
-          </p>
-          <p className="text-white">
-            Registrants: <span>{registrants}</span>/
-            {isEditing ? 
-              <input 
-                type="number" 
-                min={registrants} 
-                step="1" 
-                defaultValue={newLimit} 
-                onBlur={(e) => {
-                  const value = Math.max(Number(e.target.value), registrants);
-                  setNewLimit(value);
-                  limitInputRef.current.value = value; 
-                }} 
-                ref={limitInputRef} 
-                className="bg-transparent border-b w-14 cursor-pointer "
-              />: 
-              <span>{limit}</span>
-            } 
-            {registrants === limit && !isEditing && <span className="text-red-500"> (Full)</span>}
-          </p>
-          <div className=" p-4 rounded ">
-            <h3 className="text-white text-lg font-semibold mb-2">Registered Users:</h3>
-            <div className="max-h-36 overflow-y-auto">
-              <ul className="space-y-2">
-                {registeredUsers.map((user, index) => (
-                  <li key={index} className="flex items-center bg-gray-700 p-2 rounded-md">
-                    <span className="text-gray-300 mr-2">{index + 1}.</span>
-                    <div className="flex-1 flex justify-between">
-                      <span className="text-white font-medium">{user.name}</span>
-                      <span className="text-gray-400">{user.email}</span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className={`w-full mt-8 ${isEditing ? 'cursor-pointer' : ''}`}>
-        <h2 className="text-2xl mb-2 text-white">Description:</h2>
-        <p className="text-gray-300" contentEditable={isEditing} onBlur={handleBlur(setNewDescription)} suppressContentEditableWarning>{description}</p>
-      </div>
-      <div className="flex justify-center mt-4">
-        <button 
-          onClick={isEditing ? handleSave : () => setIsEditing(true)}
-          className={`px-4 py-2 rounded ${isEditing ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-        >
-          {isEditing ? 'Save' : 'Edit'}
-        </button>
-        {isEditing && (
-          <button 
-            onClick={() => setIsDeleteModalOpen(true)}
-            className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white ml-4"
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">Title:</span>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                className="form-input mt-1 block w-full rounded-md bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+              />
+            </label>
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">
+                Location:
+              </span>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+              />
+            </label>
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">
+                Category:
+              </span>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="form-select mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+              >
+                <option value="">Select a category</option>
+                <option>Conference</option>
+                <option>Meetup</option>
+                <option>Workshop</option>
+                <option>Seminar</option>
+                <option>Party</option>
+              </select>
+            </label>
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">
+                Date & Time:
+              </span>
+              <input
+                type="datetime-local"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+              />
+            </label>
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">
+                Description:
+              </span>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="form-textarea mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+                rows="3"
+              ></textarea>
+            </label>
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">
+                Number of Seats:
+              </span>
+              <input
+                type="number"
+                name="numberOfSeats"
+                min="1"
+                value={formData.numberOfSeats}
+                onChange={handleChange}
+                className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+              />
+            </label>
+            <label className="block mb-4">
+              <span className="text-blue-400 dark:text-blue-800">
+                Upload Images:
+              </span>
+              <input
+                type="file"
+                onChange={handleImageChange}
+                className="form-input mt-1 block w-full bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50 p-2 rounded"
+                multiple
+              />
+            </label>
+            <img
+              src={previewImage || event?.imageUrl}
+              alt="Event"
+              className="w-16 h-16 rounded-full shadow"
+            />
+            <button
+              type="submit"
+              className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out"
+            >
+              Update Event
+            </button>
+            <button
+              type="button"
+              onClick={() => openModal(event.id)}
+              className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-red-500 dark:hover:bg-red-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
+            >
+              Delete Event
+            </button>
+          </form>
+          <Modal
+            isOpen={modalIsOpen}
+            onRequestClose={closeModal}
+            contentLabel="Delete Event Confirmation"
+            style={{
+              overlay: {
+                backgroundColor: "rgba(107, 114, 128, 0.75)", // This is the Tailwind color 'bg-gray-600' with 75% opacity
+              },
+              content: {
+                top: "50%",
+                left: "50%",
+                right: "auto",
+                bottom: "auto",
+                marginRight: "-50%",
+                transform: "translate(-50%, -50%)",
+                backgroundColor: "#1F2937", // This is the Tailwind color 'bg-gray-800'
+                padding: "2rem", // This is the Tailwind size 'p-8'
+                borderRadius: "0.5rem", // This is the Tailwind size 'rounded-lg'
+                color: "#F3F4F6", // This is the Tailwind color 'text-gray-200'
+              },
+            }}
           >
-            Delete
-          </button>
-        )}
-      </div>
-      {isDeleteModalOpen && (
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-gray-800 w-[400px] h-[200px] flex flex-col items-center justify-center rounded-lg">
-            <h2 className="text-2xl text-white mb-4">Are you sure you want to delete this event?</h2>
-            <div className="flex">
-              <button 
-                onClick={handleDelete}
-                className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white mr-2"
-              >
-                Yes, delete it
-              </button>
-              <button 
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="px-4 py-2 rounded bg-gray-500 hover:bg-gray-600 text-white"
-              >
-                No, keep it
-              </button>
+            <div className="bg-gray-800 p-4 rounded flex flex-col items-center">
+              <h2 className="mb-4">
+                Are you sure you want to delete this event?
+              </h2>
+              <div>
+                <button
+                  className="bg-red-500 text-white py-2 px-4 rounded mr-2"
+                  onClick={handleDelete}
+                >
+                  Yes, delete it
+                </button>
+                <button
+                  className="bg-green-500 text-white py-2 px-4 rounded"
+                  onClick={closeModal}
+                >
+                  No, keep it
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
+          </Modal>
+        </>
+      ) : (
+        <div className="text-red-500">Event not found.</div>
       )}
     </div>
   );
-};
+}
 
 export default EventDetailPage;

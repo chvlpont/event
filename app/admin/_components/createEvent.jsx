@@ -1,6 +1,8 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { createEvent } from '../../../utils/eventservices'; // Import createEvent function
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function CreateEvent() {
   const [formData, setFormData] = useState({
@@ -12,6 +14,7 @@ function CreateEvent() {
     numberOfSeats: '',
     imageFile: null
   });
+  const fileInputRef = useRef();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,17 +34,42 @@ function CreateEvent() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const { title, location, category, date, description, numberOfSeats, imageFile } = formData;
+
+     // Check if all fields have been filled
+  if (title === '') {
+    toast.error('Please enter a title.');
+    return;
+  }
+  if (location === '') {
+    toast.error('Please enter a location.');
+    return;
+  }
+  if (category === '') {
+    toast.error('Please select a category.');
+    return;
+  }
+  if (date === '') {
+    toast.error('Please select a date.');
+    return;
+  }
+  if (description === '') {
+    toast.error('Please enter a description.');
+    return;
+  }
+  if (numberOfSeats === '') {
+    toast.error('Please enter the number of seats.');
+    return;
+  }
+  if (imageFile === null) {
+    toast.error('Please upload an image.');
+    return;
+  }
     try {
-      // Destructure form data
       const { title, location, category, date, description, numberOfSeats, imageFile } = formData;
-
-      // Call createEvent function from eventservices.js
       const eventId = await createEvent(title, date, description, imageFile, category, location, numberOfSeats);
-
-      // Optionally, you can redirect to another page or show a success message
       console.log('Event created successfully! Event ID:', eventId);
-
-      // Clear the form after successful creation
+      toast.success('Event created successfully!'); // Show success toast
       setFormData({
         title: '',
         location: '',
@@ -51,13 +79,16 @@ function CreateEvent() {
         numberOfSeats: '',
         imageFile: null
       });
+      fileInputRef.current.value = ''; // Reset the file input field
     } catch (error) {
       console.error('Failed to create event:', error);
-      // Handle error, maybe display an error message to the user
+      toast.error('Failed to create event.'); // Show error toast
     }
   };
 
   return (
+    <>
+    <ToastContainer position="top-center" />
     <form onSubmit={handleSubmit} className="w-full max-w-lg bg-blue-700 dark:bg-gray-200 p-8 rounded-lg shadow-lg">
       <label className="block mb-4">
         <span className="text-blue-400 dark:text-blue-800">Title:</span>
@@ -128,9 +159,10 @@ function CreateEvent() {
       </label>
       <label className="block mb-4">
         <span className="text-blue-400 dark:text-blue-800">Upload Images:</span>
-        <input
-          type="file"
-          onChange={handleImageChange}
+      <input
+  type="file"
+  onChange={handleImageChange}
+  ref={fileInputRef}
           className="form-input mt-1 block w-full bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50 p-2 rounded"
           multiple
         />
@@ -142,6 +174,7 @@ function CreateEvent() {
         Create Event
       </button>
     </form>
+    </>
   );
 }
 
