@@ -234,16 +234,3 @@ export async function getBookedUsersForEvent(eventId) {
     throw error;
   }
 }
-
-// // Example usage
-// async function exampleUsage() {
-//   const eventId = "your-event-id"; // Replace with your actual event ID
-//   try {
-//     const bookedUsers = await getBookedUsersForEvent(eventId);
-//     console.log("Booked users:", bookedUsers);
-//   } catch (error) {
-//     console.error("Error:", error);
-//   }
-// }
-
-exampleUsage();
