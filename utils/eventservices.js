@@ -124,9 +124,8 @@ export async function deleteEvent(eventId) {
 }
 
 // Function to book an event for a Clerk user
-export async function bookEventForUser(eventId) {
+export async function bookEventForUser(eventId, userId) {
   try {
-    const { user } = useClerk(); // Get the authenticated user from Clerk
     const eventRef = doc(db, "events", eventId);
     const eventDoc = await getDoc(eventRef);
 
@@ -137,27 +136,23 @@ export async function bookEventForUser(eventId) {
 
       // Check if all seats are already booked
       if (bookedUsers.length >= numberOfSeats) {
-        console.log("This event is fully booked.");
-        return; // Exit function
+        throw new Error("This event is fully booked.");
       }
 
       // Check if the user is already booked for the event
-      if (bookedUsers.includes(user.id)) {
-        console.log("User already booked for this event.");
-        return; // Exit function
+      if (bookedUsers.includes(userId)) {
+        throw new Error("User already booked for this event.");
       }
 
       // Add the user to the 'bookedUsers' array
-      bookedUsers.push(user.id);
+      bookedUsers.push(userId);
 
       // Update the event document with the new 'bookedUsers' array
-      await updateDoc(eventRef, {
-        bookedUsers: bookedUsers,
-      });
+      await updateDoc(eventRef, { bookedUsers });
 
       console.log("User successfully booked for the event.");
     } else {
-      console.log("Event does not exist.");
+      throw new Error("Event does not exist.");
     }
   } catch (error) {
     console.error("Error booking event:", error);
@@ -187,9 +182,8 @@ export async function getBookedEventsForUser() {
 }
 
 // Function to cancel booking for an event by a Clerk user
-export async function cancelBookingForUser(eventId) {
+export async function cancelBookingForUser(eventId, userId) {
   try {
-    const { user } = useClerk(); // Get the authenticated user from Clerk
     const eventRef = doc(db, "events", eventId);
     const eventDoc = await getDoc(eventRef);
 
@@ -203,7 +197,7 @@ export async function cancelBookingForUser(eventId) {
 
       // Remove the user from the 'bookedUsers' array
       const updatedBookedUsers = eventData.bookedUsers.filter(
-        (userId) => userId !== user.id
+        (id) => id !== userId
       );
 
       // Update the event document with the updated 'bookedUsers' array
@@ -252,4 +246,4 @@ export async function getBookedUsersForEvent(eventId) {
 //   }
 // }
 
-// exampleUsage();
+exampleUsage();

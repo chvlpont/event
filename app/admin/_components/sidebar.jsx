@@ -4,7 +4,7 @@ import { FaUser, FaCog, FaCalendarCheck, FaCalendarPlus, FaEdit, FaPaintBrush, F
 import { MdDashboard } from "react-icons/md";
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-
+import { useRouter } from 'next/navigation';
 
 const SignOutButton = dynamic(() => import('@clerk/nextjs').then(mod => mod.SignOutButton), { ssr: false });
 
@@ -13,6 +13,7 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activePage, setActivePage] = useState('dashboard');
   const [activeSubPage, setActiveSubPage] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     setIsCollapsed(window.innerWidth <= 640);
@@ -21,11 +22,9 @@ function Sidebar() {
   const handlePageSelect = (page, subPage) => {
     setActivePage(page);
     setActiveSubPage(subPage || '');
-
+  
     if (page === 'event' && !subPage) {
       setShowEventOptions(!showEventOptions);
-    } else {
-      setShowEventOptions(false);
     }
   };
 
@@ -33,6 +32,10 @@ function Sidebar() {
     if (event.key === 'Enter') {
       action();
     }
+  };
+
+  const navigateTo = (path) => {
+    router.push(path);
   };
 
   return (
@@ -50,20 +53,28 @@ function Sidebar() {
         {!isCollapsed && <p className="text-white transition-opacity duration-500 ease-in-out ">Dashboard</p>}
       </Link>
 
-      <div className={`cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 ${activePage === 'event' ? 'bg-gray-700 text-white border-l-4 border-red-500' : ''}`} onClick={() => { handlePageSelect('event'); setShowEventOptions(!showEventOptions); }} onKeyDown={(event) => handleKeyDown(event, () => { handlePageSelect('event'); setShowEventOptions(!showEventOptions); })} tabIndex="0" role="button" aria-label="Event">
+      <div
+        className={`cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 ${activePage === 'event' ? 'bg-gray-700 text-white border-l-4 border-red-500' : ''}`}
+        onClick={() => { handlePageSelect('event'); navigateTo('/admin/event'); }}
+        tabIndex="0"
+        role="button"
+        aria-label="Event"
+      >
         <FaCalendarCheck className="text-white mr-2" />
         {!isCollapsed && <p className={`text-white transition-opacity duration-500 ease-in-out ${isCollapsed ? 'opacity-0' : 'opacity-100'}`}>Event</p>}
         {!isCollapsed && (showEventOptions ? <FaChevronDown className="text-white ml-auto" /> : <FaChevronRight className="text-white ml-auto" />)}
       </div>
 
+
+
       {showEventOptions && (
         <>
-          <Link href="/admin/event/createEvent" className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('event', 'createEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('event', 'createEvent'))} tabIndex="0" role="button" aria-label="Create Event">
+          <Link href="/admin/event/create" className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('event', 'createEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('event', 'createEvent'))} tabIndex="0" role="button" aria-label="Create Event">
             <FaCalendarPlus className={`text-white mr-2 ${activePage === 'event' && activeSubPage === 'createEvent' ? '!text-blue-500' : ''}`} />
             {!isCollapsed && <p className={`text-white ${activePage === 'event' && activeSubPage === 'createEvent' ? '!text-blue-500' : ''}`}>Create Event</p>}
           </Link>
 
-          <Link href="/admin/event/editEvent" className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('event', 'editEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('event', 'editEvent'))} tabIndex="0" role="button" aria-label="Edit Event">
+          <Link href="/admin/event/edit" className="cursor-pointer flex items-center w-full mb-2 hover:bg-gray-700 p-4 pl-8" onClick={() => handlePageSelect('event', 'editEvent')} onKeyDown={(event) => handleKeyDown(event, () => handlePageSelect('event', 'editEvent'))} tabIndex="0" role="button" aria-label="Edit Event">
             <FaEdit className={`text-white mr-2 ${activeSubPage === 'editEvent' ? 'text-yellow-500' : ''}`} />
             {!isCollapsed && <p className={`text-white ${activeSubPage === 'editEvent' ? 'text-yellow-500' : ''}`}>Edit Event</p>}
           </Link>
