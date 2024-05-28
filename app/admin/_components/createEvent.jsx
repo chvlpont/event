@@ -16,6 +16,7 @@ function CreateEvent() {
   });
   const fileInputRef = useRef();
 
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -24,13 +25,17 @@ function CreateEvent() {
     });
   };
 
+  const [previewImage, setPreviewImage] = useState(null);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setFormData({
       ...formData,
       imageFile: file
     });
+    setPreviewImage(URL.createObjectURL(file));
   };
+  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -88,92 +93,93 @@ function CreateEvent() {
 
   return (
     <>
-    <ToastContainer position="top-center" />
-    <form onSubmit={handleSubmit} className="w-full max-w-lg bg-blue-700 dark:bg-gray-200 p-8 rounded-lg shadow-lg">
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Title:</span>
-        <input
-          type="text"
-          name="title"
-          value={formData.title}
-          onChange={handleChange}
-          className="form-input mt-1 block w-full rounded-md bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-        />
-      </label>
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Location:</span>
-        <input
-          type="text"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-          className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-        />
-      </label>
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Category:</span>
-        <select
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className="form-select mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
+      <ToastContainer position="top-center" />
+      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-gray-800 p-8 rounded-lg shadow-lg">
+        <label className="block mb-4">
+          <span className="text-gray-300">Title:</span>
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </label>
+        <label className="block mb-4">
+          <span className="text-gray-300">Location:</span>
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </label>
+        <label className="block mb-4">
+          <span className="text-gray-300">Category:</span>
+          <select
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            className="form-select mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          >
+            <option value="">Select a category</option>
+            <option>Conference</option>
+            <option>Meetup</option>
+            <option>Workshop</option>
+            <option>Seminar</option>
+            <option>Party</option>
+          </select>
+        </label>
+        <label className="block mb-4">
+          <span className="text-gray-300">Date & Time:</span>
+          <input
+            type="datetime-local"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </label>
+        <label className="block mb-4">
+          <span className="text-gray-300">Description:</span>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            className="form-textarea mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            rows="3"
+          ></textarea>
+        </label>
+        <label className="block mb-4">
+          <span className="text-gray-300">Number of Seats:</span>
+          <input
+            type="number"
+            name="numberOfSeats"
+            min="1"
+            value={formData.numberOfSeats}
+            onChange={handleChange}
+            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+          />
+        </label>
+        <label className="block mb-4">
+          <span className="text-gray-300">Upload Images:</span>
+          <input
+            type="file"
+            onChange={handleImageChange}
+            ref={fileInputRef}
+            className="form-input mt-1 block w-full bg-gray-100 text-gray-900 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 rounded"
+            multiple
+          />
+          {previewImage && <img src={previewImage} alt="Preview" className="w-16 h-16 rounded-full shadow my-4" />}
+        </label>
+        <button
+          type="submit"
+          className="w-full py-3 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none active:scale-95 transition duration-200 ease-in-out"
         >
-          <option value="">Select a category</option>
-          <option>Conference</option>
-          <option>Meetup</option>
-          <option>Workshop</option>
-          <option>Seminar</option>
-          <option>Party</option>
-        </select>
-      </label>
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Date & Time:</span>
-        <input
-          type="datetime-local"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-          className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-        />
-      </label>
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Description:</span>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="form-textarea mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-          rows="3"
-        ></textarea>
-      </label>
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Number of Seats:</span>
-        <input
-          type="number"
-          name="numberOfSeats"
-          min="1"
-          value={formData.numberOfSeats}
-          onChange={handleChange}
-          className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-        />
-      </label>
-      <label className="block mb-4">
-        <span className="text-blue-400 dark:text-blue-800">Upload Images:</span>
-      <input
-  type="file"
-  onChange={handleImageChange}
-  ref={fileInputRef}
-          className="form-input mt-1 block w-full bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50 p-2 rounded"
-          multiple
-        />
-      </label>
-      <button
-        type="submit"
-        className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out"
-      >
-        Create Event
-      </button>
-    </form>
+          Create Event
+        </button>
+      </form>
     </>
   );
 }
