@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { deleteEvent, getEventById, updateEvent } from "@/utils/eventservices";
 import { useRouter } from "next/navigation";
 import Modal from "react-modal";
+import { FaUser } from "react-icons/fa";
 
 function EventDetailPage({ params }) {
   const router = useRouter();
@@ -22,6 +23,11 @@ function EventDetailPage({ params }) {
     imageFile: null,
   });
   const [bookedUsernames, setBookedUsernames] = useState([]);
+
+  const newUsers = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    name: `User ${i + 1}`,
+  }));
 
   useEffect(() => {
     async function fetchEvent() {
@@ -64,6 +70,16 @@ function EventDetailPage({ params }) {
 
     fetchEvent();
   }, [params.id]);
+
+  const handleBlur = () => {
+    const bookedCount = bookedUsernames.length;
+    if (formData.numberOfSeats < bookedCount) {
+      setFormData({
+        ...formData,
+        numberOfSeats: bookedCount,
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -133,121 +149,138 @@ function EventDetailPage({ params }) {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
+    <div className="container mx-auto px-4 py-8 flex flex-col justify-center items-center">
       {event ? (
         <>
-          <h2 className="text-4xl font-bold text-center mb-6 ">Edit Event</h2>
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-lg bg-blue-700 dark:bg-gray-200 p-8 rounded-lg shadow-lg"
-          >
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">Title:</span>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full rounded-md bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-              />
-            </label>
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">
-                Location:
-              </span>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-              />
-            </label>
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">
-                Category:
-              </span>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="form-select mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-              >
-                <option value="">Select a category</option>
-                <option>Conference</option>
-                <option>Meetup</option>
-                <option>Workshop</option>
-                <option>Seminar</option>
-                <option>Party</option>
-              </select>
-            </label>
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">
-                Date & Time:
-              </span>
-              <input
-                type="datetime-local"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-              />
-            </label>
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">
-                Description:
-              </span>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="form-textarea mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-                rows="3"
-              ></textarea>
-            </label>
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">
-                Number of Seats:
-              </span>
-              <input
-                type="number"
-                name="numberOfSeats"
-                min="1"
-                value={formData.numberOfSeats}
-                onChange={handleChange}
-                className="form-input mt-1 block w-full rounded-md bg-input border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50"
-              />
-            </label>
-            <label className="block mb-4">
-              <span className="text-blue-400 dark:text-blue-800">
-                Upload Images:
-              </span>
-              <input
-                type="file"
-                onChange={handleImageChange}
-                className="form-input mt-1 block w-full bg-input text-white border-gray-600 dark:border-gray-400 shadow-sm focus:border-blue-400 dark:focus:border-blue-800 focus:ring focus:ring-blue-400 dark:focus:ring-blue-800 focus:ring-opacity-50 p-2 rounded"
-                multiple
-              />
-            </label>
-            <img
-              src={previewImage || event?.imageUrl}
-              alt="Event"
-              className="w-16 h-16 rounded-full shadow"
-            />
-            <button
-              type="submit"
-              className="w-full py-3 px-4 bg-blue-400 text-white dark:bg-blue-600 dark:text-gray-200 rounded hover:bg-blue-500 dark:hover:bg-blue-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out"
-            >
-              Update Event
-            </button>
-            <button
-              type="button"
-              onClick={() => openModal(event.id)}
-              className="w-full py-3 px-4 g-red-600 text-white dark:bg-red-700 dark:text-gray-200 rounded hover:bg-red-500 dark:hover:bg-red-900 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
-            >
-              Delete Event
-            </button>
-          </form>
+          <h2 className="text-4xl font-bold text-center mb-6">Edit Event</h2>
+          <div className="w-full max-w-6xl bg-gray-800 p-8 rounded-lg shadow-lg">
+            <div className="flex">
+              <form onSubmit={handleSubmit} className="w-3/4">
+                <label className="block mb-4">
+                  <span className="text-gray-300">Title:</span>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  />
+                </label>
+                <label className="block mb-4">
+                  <span className="text-gray-300">Location:</span>
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  />
+                </label>
+                <label className="block mb-4">
+                  <span className="text-gray-300">Category:</span>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="form-select mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  >
+                    <option value="">Select a category</option>
+                    <option>Arts & Culture</option>
+                    <option>Conference</option>
+                    <option>Food & Beverage</option>
+                    <option>Festival</option>
+                    <option>Party</option>
+                    <option>Seminar</option>
+                    <option>Sports</option>
+                    <option>Technology</option>
+                    <option>Workshop</option>
+                  </select>
+                </label>
+                <label className="block mb-4">
+                  <span className="text-gray-300">Date & Time:</span>
+                  <input
+                    type="datetime-local"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleChange}
+                    className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  />
+                </label>
+                <label className="block mb-4">
+                  <span className="text-gray-300">Description:</span>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    className="form-textarea mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                    rows="3"
+                  ></textarea>
+                </label>
+
+                <label className="block mb-4">
+                  <span className="text-gray-300">Number of Seats:</span>
+                  <input
+                    type="number"
+                    name="numberOfSeats"
+                    min="1"
+                    value={formData.numberOfSeats}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  />
+                </label>
+                <label className="block mb-4">
+                  <span className="text-gray-300">Upload Images:</span>
+                  <input
+                    type="file"
+                    onChange={handleImageChange}
+                    className="form-input mt-1 pl-2 block w-full bg-gray-100 text-gray-900 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 rounded"
+                    multiple
+                  />
+                </label>
+                <img
+                  src={previewImage || event?.imageUrl}
+                  alt="Event"
+                  className="w-16 h-16 rounded-full shadow mb-4"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-3 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none active:scale-95 transition duration-200 ease-in-out"
+                >
+                  Update Event
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openModal(event.id)}
+                  className="w-full py-3 px-4 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none active:scale-95 transition duration-200 ease-in-out mt-4"
+                >
+                  Delete Event
+                </button>
+              </form>
+              <div className="w-1/4 pl-8">
+                <h3 className="text-xl text-gray-300 font-bold mb-4">
+                  Booked Users:
+                </h3>
+                {bookedUsernames.length > 0 ? (
+                  <ul className="list-none text-gray-100 bg-gray-700 p-4 rounded shadow max-h-96 overflow-y-auto">
+                    {bookedUsernames.map((username, index) => (
+                      <li
+                        key={index}
+                        className="flex items-center border-b border-slate-600/40 py-2"
+                      >
+                        <FaUser className="mr-2 text-gray-400" />
+                        {username}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-400">
+                    No users have booked this event yet.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
           <Modal
             isOpen={modalIsOpen}
             onRequestClose={closeModal}
@@ -297,5 +330,4 @@ function EventDetailPage({ params }) {
     </div>
   );
 }
-
 export default EventDetailPage;
