@@ -24,6 +24,8 @@ function EventDetailPage({ params }) {
   });
   const [bookedUsernames, setBookedUsernames] = useState([]);
 
+  const newUsers = Array.from({length: 20}, (_, i) => ({id: i, name: `User ${i+1}`}));
+
   useEffect(() => {
     async function fetchEvent() {
       try {
@@ -56,6 +58,7 @@ function EventDetailPage({ params }) {
         // Log the usernames of booked users
         console.log("Booked user usernames:", bookedUsernames);
 
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching event:", error);
