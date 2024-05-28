@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { deleteEvent, getEventById, updateEvent } from "@/utils/eventservices";
 import { useRouter } from "next/navigation";
 import Modal from "react-modal";
-import { FaUser } from 'react-icons/fa';
+import { FaUser } from "react-icons/fa";
 
 function EventDetailPage({ params }) {
   const router = useRouter();
@@ -24,7 +24,10 @@ function EventDetailPage({ params }) {
   });
   const [bookedUsernames, setBookedUsernames] = useState([]);
 
-  const newUsers = Array.from({length: 20}, (_, i) => ({id: i, name: `User ${i+1}`}));
+  const newUsers = Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    name: `User ${i + 1}`,
+  }));
 
   useEffect(() => {
     async function fetchEvent() {
@@ -58,7 +61,6 @@ function EventDetailPage({ params }) {
         // Log the usernames of booked users
         console.log("Booked user usernames:", bookedUsernames);
 
-        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching event:", error);
@@ -68,7 +70,6 @@ function EventDetailPage({ params }) {
 
     fetchEvent();
   }, [params.id]);
-
 
   const handleBlur = () => {
     const bookedCount = bookedUsernames.length;
@@ -80,7 +81,6 @@ function EventDetailPage({ params }) {
     }
   };
 
-  
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8  flex flex-col justify-center items-center ">
@@ -148,7 +148,7 @@ function EventDetailPage({ params }) {
     setModalIsOpen(false);
   };
 
-   return (
+  return (
     <div className="container mx-auto px-4 py-8 flex flex-col justify-center items-center">
       {event ? (
         <>
@@ -185,11 +185,15 @@ function EventDetailPage({ params }) {
                     className="form-select mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
                   >
                     <option value="">Select a category</option>
+                    <option>Arts & Culture</option>
                     <option>Conference</option>
-                    <option>Meetup</option>
-                    <option>Workshop</option>
-                    <option>Seminar</option>
+                    <option>Food & Beverage</option>
+                    <option>Festival</option>
                     <option>Party</option>
+                    <option>Seminar</option>
+                    <option>Sports</option>
+                    <option>Technology</option>
+                    <option>Workshop</option>
                   </select>
                 </label>
                 <label className="block mb-4">
@@ -212,9 +216,7 @@ function EventDetailPage({ params }) {
                     rows="3"
                   ></textarea>
                 </label>
-                <label className="block mb-4">
-                  <span className="text-gray-300">Number of Seats:</span>
-                  </label>
+
                 <label className="block mb-4">
                   <span className="text-gray-300">Number of Seats:</span>
                   <input
@@ -256,18 +258,25 @@ function EventDetailPage({ params }) {
                 </button>
               </form>
               <div className="w-1/4 pl-8">
-                <h3 className="text-xl text-gray-300 font-bold mb-4">Booked Users:</h3>
+                <h3 className="text-xl text-gray-300 font-bold mb-4">
+                  Booked Users:
+                </h3>
                 {bookedUsernames.length > 0 ? (
                   <ul className="list-none text-gray-100 bg-gray-700 p-4 rounded shadow max-h-96 overflow-y-auto">
                     {bookedUsernames.map((username, index) => (
-                      <li key={index} className="flex items-center border-b border-slate-600/40 py-2">
+                      <li
+                        key={index}
+                        className="flex items-center border-b border-slate-600/40 py-2"
+                      >
                         <FaUser className="mr-2 text-gray-400" />
                         {username}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-400">No users have booked this event yet.</p>
+                  <p className="text-gray-400">
+                    No users have booked this event yet.
+                  </p>
                 )}
               </div>
             </div>
@@ -295,7 +304,9 @@ function EventDetailPage({ params }) {
             }}
           >
             <div className="bg-gray-800 p-4 rounded flex flex-col items-center">
-              <h2 className="mb-4">Are you sure you want to delete this event?</h2>
+              <h2 className="mb-4">
+                Are you sure you want to delete this event?
+              </h2>
               <div>
                 <button
                   className="bg-red-500 text-white py-2 px-4 rounded mr-2"
