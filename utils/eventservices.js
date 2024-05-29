@@ -6,6 +6,7 @@ import {
   updateDoc,
   deleteDoc,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
@@ -231,6 +232,66 @@ export async function getBookedUsersForEvent(eventId) {
     }
   } catch (error) {
     console.error("Error getting booked users for event:", error);
+    throw error;
+  }
+}
+
+// CMS functions for landing page content management
+
+// Function to create landing page content
+export async function createLandingPageContent(contentId, contentData) {
+  try {
+    const contentRef = doc(db, "landingPageContent", contentId);
+    await setDoc(contentRef, contentData);
+    console.log("Landing page content created successfully!");
+  } catch (error) {
+    console.error("Error creating landing page content:", error.message);
+    throw error;
+  }
+}
+
+// Function to retrieve the landing page content
+export async function getLandingPageContent() {
+  try {
+    const contentCollection = collection(db, "landingPageContent");
+    const snapshot = await getDocs(contentCollection);
+    
+    const content = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return content.length > 0 ? content[0] : null;
+  } catch (error) {
+    console.error("Error getting landing page content:", error);
+    throw error;
+  }
+}
+
+// Function to update the landing page content
+export async function updateLandingPageContent(contentId, updatedData) {
+  try {
+    const contentRef = doc(db, "landingPageContent", contentId);
+    await updateDoc(contentRef, updatedData);
+    console.log("Landing page content updated successfully!");
+  } catch (error) {
+    if (error.code === 'not-found') {
+      await createLandingPageContent(contentId, updatedData);
+    } else {
+      console.error("Error updating landing page content:", error);
+      throw error;
+    }
+  }
+}
+
+// Function to delete the landing page content
+export async function deleteLandingPageContent(contentId) {
+  try {
+    const contentRef = doc(db, "landingPageContent", contentId);
+    await deleteDoc(contentRef);
+    console.log("Landing page content deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting landing page content:", error);
     throw error;
   }
 }
