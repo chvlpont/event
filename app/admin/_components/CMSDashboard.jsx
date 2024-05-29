@@ -1,18 +1,36 @@
 'use client'
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { getLandingPageContent,updateLandingPageContent } from '@/utils/eventservices';
+import { db, storage } from '@/firebase.config';
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
-function CMSPage() {
-  // Initial hardcoded values
-  const initialTitle = 'En jättebra rubrik';
-  const initialContent = 'en cool slogan';
-  const initialImage = 'https://images.unsplash.com/photo-1622465911368-72162f8da3e2?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+function CMSDashboard() {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [image, setImage] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
+  const fileInputRef = useRef();
 
-  // State hooks with initial values
-  const [title, setTitle] = useState(initialTitle);
-  const [content, setContent] = useState(initialContent);
-  const [image, setImage] = useState(initialImage);
-  const [imagePreview, setImagePreview] = useState(initialImage);
-  const fileInputRef = useRef(); // Creating a ref for file input
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getLandingPageContent();
+        if (data) {
+          console.log('Fetched content:', data); // Debugging
+          setTitle(data.title);
+          setContent(data.content); // Ensure this matches the Firestore field
+          setImagePreview(data.imageUrl);
+          // Don't set the image file with the URL
+        } else {
+          console.log('No content found!');
+        }
+      } catch (error) {
+        console.error('Error fetching content: ', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   const handleTitleChange = (e) => setTitle(e.target.value);
   const handleContentChange = (e) => setContent(e.target.value);
@@ -20,21 +38,43 @@ function CMSPage() {
     if (e.target.files.length > 0) {
       const file = e.target.files[0];
       setImage(file);
-      setImagePreview(URL.createObjectURL(file)); // Update the preview image
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ title, content, image });
-    // Here you would handle the form submission to a backend or state management
+  
+    const contentId = 'mainContent'; // Use your document ID
+  
+    // Upload image to Firebase Storage
+    const storageRef = ref(storage, `images/${image.name}`);
+    const uploadTask = await uploadBytesResumable(storageRef, image);
+    const downloadURL = await getDownloadURL(uploadTask.ref);
+
+    const updatedData = {
+      title,
+      content,
+      imageUrl: downloadURL, // Save the download URL to Firestore
+    };
+
+    // Update Firestore
+    await updateLandingPageContent(contentId, updatedData);
   };
 
-  const handleCancel = () => {
-    setTitle(initialTitle);
-    setContent(initialContent);
-    setImagePreview(initialImage);
-    fileInputRef.current.value = ""; // Reset file input
+  const handleCancel = async () => {
+    try {
+      const data = await getLandingPageContent();
+      if (data) {
+        setTitle(data.title);
+        setContent(data.description);
+        setImagePreview(data.imageUrl);
+        setImage(data.imageUrl);
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error('Error fetching content: ', error);
+    }
   };
 
   return (
@@ -107,4 +147,4 @@ function CMSPage() {
   );
 }
 
-export default CMSPage;
+export default CMSDashboard;
