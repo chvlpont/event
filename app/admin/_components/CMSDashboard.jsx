@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { getLandingPageContent, createLandingPageContent, updateLandingPageContent } from '@/utils/eventservices';
 import { storage } from '@/firebase.config';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 function CMSDashboard() {
   const [title, setTitle] = useState('');
@@ -10,6 +12,9 @@ function CMSDashboard() {
   const [image, setImage] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const fileInputRef = useRef();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -61,11 +66,20 @@ function CMSDashboard() {
 
     try {
       await updateLandingPageContent(contentId, updatedData);
+      setSnackbarMessage('Content successfully updated!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
     } catch (error) {
       if (error.code === 'not-found') {
         await createLandingPageContent(contentId, updatedData);
+        setSnackbarMessage('Content successfully created!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
       } else {
         console.error('Error updating/creating content: ', error);
+        setSnackbarMessage('Error updating/creating content');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       }
     }
   };
@@ -83,6 +97,10 @@ function CMSDashboard() {
     } catch (error) {
       console.error('Error fetching content: ', error);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -142,10 +160,20 @@ function CMSDashboard() {
           </button>
         </div>
       </form>
+
+      <Snackbar
+  open={snackbarOpen}
+  autoHideDuration={6000}
+  onClose={handleCloseSnackbar}
+  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} // Centering the Snackbar
+>
+  <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+    {snackbarMessage}
+  </Alert>
+</Snackbar>
     </div>
   );
 }
-
 export default CMSDashboard;
 
 
