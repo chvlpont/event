@@ -6,6 +6,7 @@ import {
   updateDoc,
   deleteDoc,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase.config"; // Import Firestore database and Storage references
@@ -235,34 +236,14 @@ export async function getBookedUsersForEvent(eventId) {
   }
 }
 
-
-
-
 // CMS functions for landing page content management
 
 // Function to create landing page content
-export async function createLandingPageContent(title, description, imageFile) {
+export async function createLandingPageContent(contentId, contentData) {
   try {
-    if (!imageFile) {
-      throw new Error("Image file is required.");
-    }
-
-    const imageRef = ref(storage, `landingPageImages/${imageFile.name}`);
-    await uploadBytes(imageRef, imageFile);
-
-    // Get download URL of the uploaded image
-    const imageUrl = await getDownloadURL(imageRef);
-
-    const contentCollection = collection(db, "landingPageContent");
-    const newContent = {
-      title,
-      description,
-      imageUrl,
-    };
-
-    const contentRef = await addDoc(contentCollection, newContent);
-    console.log("Landing page content created successfully! Document ID:", contentRef.id);
-    return contentRef.id;
+    const contentRef = doc(db, "landingPageContent", contentId);
+    await setDoc(contentRef, contentData);
+    console.log("Landing page content created successfully!");
   } catch (error) {
     console.error("Error creating landing page content:", error.message);
     throw error;
@@ -272,17 +253,15 @@ export async function createLandingPageContent(title, description, imageFile) {
 // Function to retrieve the landing page content
 export async function getLandingPageContent() {
   try {
-    console.log('Attempting to get content from cmsData/cmscontent'); // Debugging
-    const contentDoc = doc(db, 'cmsData', 'mainContent');
-    const docSnap = await getDoc(contentDoc);
-    console.log('Document snapshot:', docSnap); // Debugging
-    if (docSnap.exists()) {
-      console.log('Document data:', docSnap.data()); // Additional debugging
-      return { id: docSnap.id, ...docSnap.data() };
-    } else {
-      console.log('No document found in cmsData/mainContent'); // Debugging
-      return null;
-    }
+    const contentCollection = collection(db, "landingPageContent");
+    const snapshot = await getDocs(contentCollection);
+    
+    const content = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return content.length > 0 ? content[0] : null;
   } catch (error) {
     console.error("Error getting landing page content:", error);
     throw error;
@@ -290,24 +269,18 @@ export async function getLandingPageContent() {
 }
 
 // Function to update the landing page content
-export async function updateLandingPageContent(contentId, updatedData, imageFile = null) {
+export async function updateLandingPageContent(contentId, updatedData) {
   try {
-    const contentDoc = doc(db, 'cmsData', 'mainContent');
-
-    // If imageFile is provided, update the image
-    if (imageFile) {
-      const imageRef = ref(storage, `landingPageImages/${imageFile.name}`);
-      await uploadBytes(imageRef, imageFile);
-
-      // Get download URL of the uploaded image
-      updatedData.imageUrl = await getDownloadURL(imageRef);
-    }
-
+    const contentRef = doc(db, "landingPageContent", contentId);
     await updateDoc(contentRef, updatedData);
     console.log("Landing page content updated successfully!");
   } catch (error) {
-    console.error("Error updating landing page content:", error);
-    throw error;
+    if (error.code === 'not-found') {
+      await createLandingPageContent(contentId, updatedData);
+    } else {
+      console.error("Error updating landing page content:", error);
+      throw error;
+    }
   }
 }
 
