@@ -128,7 +128,7 @@ function CreateEvent() {
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </label>
         <label className="block mb-4">
@@ -138,7 +138,7 @@ function CreateEvent() {
             name="location"
             value={formData.location}
             onChange={handleChange}
-            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </label>
         <label className="block mb-4">
@@ -147,7 +147,7 @@ function CreateEvent() {
             name="category"
             value={formData.category}
             onChange={handleChange}
-            className="form-select mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="form-select mt-1 pl-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           >
             <option value="">Select a category</option>
             <option>Arts & Culture</option>
@@ -168,7 +168,7 @@ function CreateEvent() {
             name="date"
             value={formData.date}
             onChange={handleChange}
-            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="form-input mt-1 pl-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </label>
         <label className="block mb-4">
@@ -177,7 +177,7 @@ function CreateEvent() {
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="form-textarea mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="form-textarea mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
             rows="3"
           ></textarea>
         </label>
@@ -189,7 +189,7 @@ function CreateEvent() {
             min="1"
             value={formData.numberOfSeats}
             onChange={handleChange}
-            className="form-input mt-1 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+            className="form-input mt-1 pl-2 block w-full rounded-md bg-gray-100 border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
           />
         </label>
         <label className="block mb-4">
@@ -198,7 +198,13 @@ function CreateEvent() {
             type="file"
             onChange={handleImageChange}
             ref={fileInputRef}
-            className="form-input mt-1 block w-full bg-gray-100 text-gray-900 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 rounded"
+            className="block w-full my-4 text-sm text-gray-400
+        file:mr-4 file:py-2 file:px-4
+        file:rounded-full file:border-0
+        file:text-sm file:font-semibold
+        file:bg-indigo-50 file:text-indigo-700
+        hover:file:bg-indigo-100
+      "
             multiple
           />
           {previewImage && (

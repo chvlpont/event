@@ -24,10 +24,7 @@ function EventDetailPage({ params }) {
   });
   const [bookedUsernames, setBookedUsernames] = useState([]);
 
-  const newUsers = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    name: `User ${i + 1}`,
-  }));
+
 
   useEffect(() => {
     async function fetchEvent() {
@@ -234,7 +231,13 @@ function EventDetailPage({ params }) {
                   <input
                     type="file"
                     onChange={handleImageChange}
-                    className="form-input mt-1 pl-2 block w-full bg-gray-100 text-gray-900 border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 rounded"
+                    className="block w-full my-4 text-sm text-gray-400
+        file:mr-4 file:py-2 file:px-4
+        file:rounded-full file:border-0
+        file:text-sm file:font-semibold
+        file:bg-indigo-50 file:text-indigo-700
+        hover:file:bg-indigo-100
+      "
                     multiple
                   />
                 </label>

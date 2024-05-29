@@ -1,12 +1,12 @@
 import React from 'react';
+import CMSDashboard from '../_components/CMSDashboard';
 
-function CMSDashboard() {
+function CMSPage() {
   return (
     <div>
-      <h1>Site Builder</h1>
-      <p>Welcome to the site builder page!</p>
+     <CMSDashboard />
     </div>
   );
 }
 
-export default CMSDashboard;
+export default CMSPage;
