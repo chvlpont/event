@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
+
 import {
   SignInButton,
   SignUpButton,
@@ -20,6 +21,8 @@ function LandingPage() {
     imageUrl: "",
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     getLandingPageContent().then((data) => {
       if (data) {
@@ -28,9 +31,20 @@ function LandingPage() {
           content: data.content,
           imageUrl: data.imageUrl,
         });
+        setIsLoading(false);
       }
     });
   }, []);
+
+  const loader = (
+    <div className="flex items-center justify-center h-screen">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+    </div>
+  );
+
+  if (isLoading) {
+    return loader;
+  }
 
   return (
     <>
